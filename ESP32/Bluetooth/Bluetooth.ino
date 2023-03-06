@@ -11,13 +11,17 @@ BluetoothSerial SerialBT;
 // Define the address of the PCF8574
 #define PCF8574_ADDR 0x20
 
-// Define the control bits of the motor module
+// Define the control pins of the motor module
 #define ENA 1
 #define IN1 2
 #define IN2 3
 #define ENB 4
 #define IN3 5
 #define IN4 6
+
+// Define I2C pins
+#define I2C_SDA 21
+#define I2C_SCL 22
 
 String msg = "";
 
@@ -27,7 +31,7 @@ void setup() {
   SerialBT.begin("Robot");
 
   // Initialize communication with the PCF8574
-  Wire.begin();
+  Wire.begin(I2C_SDA, I2C_SCL);
 
   // Set the control bits of the PCF8574 as outputs
   Wire.beginTransmission(PCF8574_ADDR);
@@ -41,19 +45,17 @@ void loop() {
     SerialBT.write(Serial.read());
   }
 
+  // Testing turn on led when receive message
   if (SerialBT.available()) {
     msg = SerialBT.readString();
     Serial.print(msg);
 
-    // TODO
-    if (msg.compareTo("m") == 0) {
-        Serial.println("Starting...");
-        // Rotate motor A and B clockwise
-        Wire.beginTransmission(PCF8574_ADDR);
-        Wire.write(0b00000110);
-        Wire.endTransmission();
-    }
+    Wire.beginTransmission(PCF8574_ADDR);
+    Wire.write(0b00000010); 
+    Wire.endTransmission();
+
     msg = "";
   }
+
   delay(20);
 }
