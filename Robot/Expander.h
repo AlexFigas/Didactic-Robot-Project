@@ -1,21 +1,25 @@
 #ifndef EXPANDER_H
 #define EXPANDER_H
 
+#include <Arduino.h>
+#include <Adafruit_PWMServoDriver.h>
+#include <Wire.h>
+
 class Expander
 {
 public:
     // Constructor
-    Expander(uint8_t Address = 0x40);
+    Expander(byte address = 0x40);
 
     // Methods
     void begin();
-    void setDutyCycle(uint8_t channel, int duty_cycle);
+    void setDutyCycle(byte channel, byte duty_cycle);
 
     // Variables
 
 private:
     // Variables
-    uint8_t _ADDR;
+    byte _ADDR;
     Adafruit_PWMServoDriver _board;
 };
 
