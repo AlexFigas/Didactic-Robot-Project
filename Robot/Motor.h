@@ -22,25 +22,32 @@ class Motor
 {
 public:
     // Constructor
-    Motor(Expander expander = Expander(), MotorController controller = MotorController());
+    Motor(byte id, Expander expander = Expander(), MotorController controller = MotorController());
 
     // Methods
     void begin();
     void setDirection(bool clockwise);
-    void interruptCounter();
 
     void front(int cm);
     void back(int cm);
+    void _stop();
 
+    void incrementCount();
+    int getCount();
 
 private:
     // Variables
     Expander _expander;
     Interrupt _interrupt;
+    byte _id;
     MotorController _controller;
-    int _counter = 0;
+    int _interruptForDistance = 0;
+    int count;
+    static int _motorCounters[4];
 
     // Methods
+    void _computeInterruptDistance(int cm);
+    void _begin(byte id);
 };
 
 #endif
