@@ -4,18 +4,18 @@
 #include <Arduino.h>
 #include "Expander.h"
 
+struct Interrupt
+{
+    byte PIN_DO;
+    byte INT_COUNT;
+};
+
 struct MotorController
 {
     byte PIN_EN;
     byte PIN_IN1;
     byte PIN_IN2;
     Interrupt interrupt;
-};
-
-struct Interrupt
-{
-    byte PIN_DO;
-    byte INT_COUNT;
 };
 
 class Motor
@@ -27,6 +27,7 @@ public:
     // Methods
     void begin();
     void setDirection(bool clockwise);
+    void interruptCounter();
 
     void front(int cm);
     void back(int cm);
@@ -40,7 +41,6 @@ private:
     int _counter = 0;
 
     // Methods
-    void _interruptCounter();
 };
 
 #endif
