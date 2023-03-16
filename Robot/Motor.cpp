@@ -1,20 +1,19 @@
 #include "Motor.h"
 
-Motor::Motor(byte id, Expander expander, MotorController controller)
+Motor::Motor(Expander expander, MotorController controller)
 {
     _expander = expander;
     _controller = controller;
-    _id = id;
 }
 
 void Motor::incrementCount()
 {
-    Motor::_motorCounters[_id]++;
+    ++_count;
 }
 
 int Motor::getCount()
 {
-    return Motor::_motorCounters[_id];
+    return _count;
 }
 
 void Motor::begin()
@@ -24,15 +23,18 @@ void Motor::begin()
     _expander.setDutyCycle(_controller.PIN_EN, 0);
     setDirection(true);
 
-
     // If the motor has an interrupt
     if (_controller.interrupt.PIN_DO != 0 && _controller.interrupt.INT_COUNT != 0)
     {
-
         // Assign current instance to pointer
-        pinMode(_controller.interrupt.PIN_DO, INPUT);
 
-        // FIXME: This is not working
+        // TODO: This is not working
+        // pinMode(_controller.interrupt.PIN_DO, INPUT);
+        // attachInterrupt(
+        //     digitalPinToInterrupt(_controller.interrupt.PIN_DO),
+        //     incrementCount,
+        //     RISING);
+
         // Motor *pointer = this;
         // attachInterrupt(
         //     digitalPinToInterrupt(_controller.interrupt.PIN_DO),
@@ -41,12 +43,19 @@ void Motor::begin()
         //     },
         //     RISING);
 
-        attachInterrupt(
-            digitalPinToInterrupt(_controller.interrupt.PIN_DO),
-            []() -> void {
-                Motor::_motorCounters[_id]++;
-            },
-            RISING);
+        // attachInterrupt(
+        //     digitalPinToInterrupt(_controller.interrupt.PIN_DO),
+        //     []() -> void {
+        //         Motor::_motorCounters[id]++;
+        //     },
+        //     RISING);
+
+        /* 
+            Já foi testado com:
+            Variável estática
+            Variável estática com ponteiro
+            
+         */
     }
 }
 
@@ -66,7 +75,7 @@ void Motor::setDirection(bool clockwise)
 
 void Motor::front(int cm)
 {
-    count = 0;
+    _count = 0;
     setDirection(true);
     _expander.setDutyCycle(_controller.PIN_EN, 100);
     _computeInterruptDistance(cm);
@@ -74,7 +83,7 @@ void Motor::front(int cm)
 
 void Motor::back(int cm)
 {
-    count = 0;
+    _count = 0;
     setDirection(false);
     _expander.setDutyCycle(_controller.PIN_EN, 100);
     _computeInterruptDistance(cm);
