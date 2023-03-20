@@ -4,16 +4,7 @@ Motor::Motor(Expander expander, MotorController controller)
 {
     _expander = expander;
     _controller = controller;
-}
-
-void Motor::incrementCount()
-{
-    ++_count;
-}
-
-int Motor::getCount()
-{
-    return _count;
+    _counter = 0;
 }
 
 void Motor::begin()
@@ -23,39 +14,12 @@ void Motor::begin()
     _expander.setDutyCycle(_controller.PIN_EN, 0);
     setDirection(true);
 
+    pinMode(_controller.interrupt.PIN_DO, INPUT_PULLUP);
+
     // If the motor has an interrupt
     if (_controller.interrupt.PIN_DO != 0 && _controller.interrupt.INT_COUNT != 0)
     {
-        // Assign current instance to pointer
-
-        // TODO: This is not working
-        // pinMode(_controller.interrupt.PIN_DO, INPUT);
-        // attachInterrupt(
-        //     digitalPinToInterrupt(_controller.interrupt.PIN_DO),
-        //     incrementCount,
-        //     RISING);
-
-        // Motor *pointer = this;
-        // attachInterrupt(
-        //     digitalPinToInterrupt(_controller.interrupt.PIN_DO),
-        //     []() -> void {
-        //         pointer->incrementCount();
-        //     },
-        //     RISING);
-
-        // attachInterrupt(
-        //     digitalPinToInterrupt(_controller.interrupt.PIN_DO),
-        //     []() -> void {
-        //         Motor::_motorCounters[id]++;
-        //     },
-        //     RISING);
-
-        /* 
-            Já foi testado com:
-            Variável estática
-            Variável estática com ponteiro
-            
-         */
+        attachInterrupt(digitalPinToInterrupt(_controller.interrupt.PIN_DO), std::bind(&Motor::_incrementCounter, this), RISING);
     }
 }
 
@@ -73,30 +37,38 @@ void Motor::setDirection(bool clockwise)
     }
 }
 
-void Motor::front(int cm)
+void Motor::front(int speed) // TODO: Implement cm
 {
-    _count = 0;
+    resetCounter();
     setDirection(true);
-    _expander.setDutyCycle(_controller.PIN_EN, 100);
-    _computeInterruptDistance(cm);
+    _expander.setDutyCycle(_controller.PIN_EN, speed);
 }
 
-void Motor::back(int cm)
+void Motor::back(int cm) // TODO: Implement cm
 {
-    _count = 0;
+    resetCounter();
     setDirection(false);
     _expander.setDutyCycle(_controller.PIN_EN, 100);
-    _computeInterruptDistance(cm);
 }
 
-void Motor::_stop()
+void Motor::stop(bool now) // TODO: Implement now
 {
     _expander.setDutyCycle(_controller.PIN_EN, 0);
     _expander.setDutyCycle(_controller.PIN_IN1, 0);
     _expander.setDutyCycle(_controller.PIN_IN2, 0);
 }
 
-void Motor::_computeInterruptDistance(int cm)
+void Motor::_incrementCounter()
 {
-    _interruptForDistance = (int)round(cm * _controller.interrupt.INT_COUNT / 20.42);
+    ++_counter;
+}
+
+int Motor::getCounter()
+{
+    return _counter;
+}
+
+void Motor::resetCounter()
+{
+    _counter = 0;
 }

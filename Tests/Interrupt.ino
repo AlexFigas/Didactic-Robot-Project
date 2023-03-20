@@ -1,41 +1,25 @@
-#include "Expander.h"
+#define IN1 3
+#define IN2 4
+#define EN 5
 
-Expander expander;
+#define INTERRUPT_PIN 12
 
-#define ENABLE_A 0
-#define IN1 1
-#define IN2 2
-
-#define PIN_INTERRUPT 2
+volatile int count = 0;
 
 void setup()
 {
-    expander.begin();
-    expander.setDutyCycle(ENABLE_A, 100); // Enable
-    expander.setDutyCycle(IN1, 100);      // Cloclwise
-    expander.setDutyCycle(IN2, 0);        // Counterclockwise
+    Serial.begin(9600);
 
-    pinMode(PIN_INTERRUPT, INPUT);
-    if (digitalRead(PIN_INTERRUPT) == HIGH)
-    {
-        attachInterrupt(digitalPinToInterrupt(PIN_INTERRUPT), count, FALLING);
-    }
-    else
-    {
-        attachInterrupt(digitalPinToInterrupt(PIN_INTERRUPT), count, RISING);
-    }
-}
-
-int counter = 0;
-void count()
-{
-    counter++;
+    pinMode(INTERRUPT_PIN, INPUT);
+    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), counter, RISING);
 }
 
 void loop()
 {
-    if (counter >= 20)
-    {
-        expander.setDutyCycle(ENABLE_A, 0);
-    }
+    Serial.println(count);
+}
+
+void counter()
+{
+    count++;
 }

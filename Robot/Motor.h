@@ -1,51 +1,114 @@
+/*
+ * Motor.h - Library for controlling a DC motor using an H-bridge driver.
+ *
+ * Written by Alexandre Figueiredo and Daniela Gonçalves
+ */
+
 #ifndef MOTOR_H
 #define MOTOR_H
 
 #include <Arduino.h>
 #include "Expander.h"
+#include <FunctionalInterrupt.h>
 
+/*
+ * Struct representing an interrupt configuration.
+ */
 struct Interrupt
 {
-    byte PIN_DO;
-    byte INT_COUNT;
+    byte PIN_DO;    // Digital input pin for the interrupt
+    byte INT_COUNT; // Interrupt counter value
 };
 
+/*
+ * Struct representing a motor controller configuration.
+ */
 struct MotorController
 {
-    byte PIN_EN;
-    byte PIN_IN1;
-    byte PIN_IN2;
-    Interrupt interrupt;
+    byte PIN_EN;         // Enable pin for the motor controller
+    byte PIN_IN1;        // Input 1 pin for the motor controller
+    byte PIN_IN2;        // Input 2 pin for the motor controller
+    Interrupt interrupt; // Interrupt configuration for the motor controller
 };
 
+/*
+ * Class representing a DC motor.
+ */
 class Motor
 {
 public:
-    // Constructor
+    /*
+     * Constructor for the Motor class.
+     *
+     * @param expander - An optional Expander object for expanding the available GPIO pins.
+     * @param controller - An optional MotorController object for configuring the motor controller.
+     */
     Motor(Expander expander = Expander(), MotorController controller = MotorController());
 
-    // Methods
+    /*
+     * Initializes the motor and motor controller pins.
+     * This method should be called once at the beginning of the program.
+     */
     void begin();
+
+    /*
+     * Sets the direction of the motor.
+     *
+     * @param clockwise - A boolean indicating the direction of the motor.
+     *                    true for clockwise, false for counterclockwise.
+     */
     void setDirection(bool clockwise);
 
-    void front(int cm);
-    void back(int cm);
-    void _stop();
+    /*
+     * Starts the motor in the forward direction.
+     *
+     * @param speed - An integer indicating the speed of the motor.
+     *                Must be between 0 and 100.
+     */
+    void front(int speed);
 
-    void incrementCount();
-    int getCount();
+    /*
+     * Starts the motor in the backward direction.
+     *
+     * @param speed - An integer indicating the speed of the motor.
+     *                Must be between 0 and 100.
+     */
+    void back(int speed);
+
+    /*
+     * Stops the motor.
+     *
+     * @param now - A boolean indicating whether to stop the motor immediately (true) or coast to a stop (false).
+     *              Defaults to 0x40
+     */
+    void stop(bool now = false);
+
+    /*
+     * Gets the current interrupt count.
+     *
+     * @return An integer representing the interrupt count.
+     */
+    int getCounter();
+
+    /*
+     * Resets the interrupt count to zero.
+     */
+    void resetCounter();
 
 private:
-    // Variables
-    Expander _expander;
-    Interrupt _interrupt;
-    MotorController _controller;
-    int _interruptForDistance = 0;
-    int _count;
-    static int _motorCounters[4];
+    // Private variables
+    Expander _expander;          // The Expander object for expanding the available GPIO pins
+    Interrupt _interrupt;        // The Interrupt object for configuring the interrupt
+    MotorController _controller; // The MotorController object for configuring the motor controller
+    volatile int _counter;       // The interrupt counter for the motor
 
-    // Methods
-    void _computeInterruptDistance(int cm);
+    // Private methods
+
+    /*
+     * Interrupt service routine for counting interrupts.
+     * This method should not be called directly.
+     */
+    IRAM_ATTR void _incrementCounter();
 };
 
 #endif

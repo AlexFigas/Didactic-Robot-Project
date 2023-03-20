@@ -2,15 +2,18 @@
 
 Expander::Expander(byte address)
 {
-    // Constructor
-    _ADDR = address;
-    _board = Adafruit_PWMServoDriver(_ADDR);
+    _address = address;
+    _board = Adafruit_PWMServoDriver(_address);
+    _initialized = false;
 }
 
 void Expander::begin()
 {
-    // Initialize I2C
-    _board.begin();
+    if (!_initialized)
+    {
+        _board.begin();
+        _initialized = true;
+    }
 }
 
 void Expander::setDutyCycle(byte channel, byte duty_cycle)
