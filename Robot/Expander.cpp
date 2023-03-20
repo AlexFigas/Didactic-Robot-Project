@@ -18,6 +18,6 @@ void Expander::begin()
 
 void Expander::setDutyCycle(byte channel, byte duty_cycle)
 {
-    int pwm_on = map(duty_cycle, 0, 100, 0, 4095);
-    _board.setPWM(channel, 0, pwm_on);
+    int pwm_on_point = map(duty_cycle, _MIN_DUTY_CYCLE, _MAX_DUTY_CYCLE, _MIN_PWM_ON, _MAX_PWM_ON);
+    _board.setPWM(channel, _PWM_OFF_POINT, pwm_on_point);
 }

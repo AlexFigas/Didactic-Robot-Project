@@ -37,6 +37,12 @@ struct MotorController
 class Motor
 {
 public:
+    // Public constants
+
+    // Public variables
+
+    // Public methods
+
     /*
      * Constructor for the Motor class.
      *
@@ -96,6 +102,10 @@ public:
     void resetCounter();
 
 private:
+    // Private constants
+    static const int _FULL_SPEED = 100; // The maximum speed value
+    static const int _STOP_SPEED = 0;   // The minimum speed value
+
     // Private variables
     Expander _expander;          // The Expander object for expanding the available GPIO pins
     Interrupt _interrupt;        // The Interrupt object for configuring the interrupt

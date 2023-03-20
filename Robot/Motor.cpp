@@ -16,6 +16,7 @@ void Motor::begin()
 
     pinMode(_controller.interrupt.PIN_DO, INPUT_PULLUP);
 
+    // TODO: Finish no interrupt implementation
     // If the motor has an interrupt
     if (_controller.interrupt.PIN_DO != 0 && _controller.interrupt.INT_COUNT != 0)
     {
@@ -27,13 +28,13 @@ void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
     {
-        _expander.setDutyCycle(_controller.PIN_IN1, 100); // Cloclwise
-        _expander.setDutyCycle(_controller.PIN_IN2, 0);   // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Cloclwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
     }
     else
     {
-        _expander.setDutyCycle(_controller.PIN_IN1, 0);   // Cloclwise
-        _expander.setDutyCycle(_controller.PIN_IN2, 100); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED); // Cloclwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED); // Counterclockwise
     }
 }
 
@@ -44,18 +45,27 @@ void Motor::front(int speed) // TODO: Implement cm
     _expander.setDutyCycle(_controller.PIN_EN, speed);
 }
 
-void Motor::back(int cm) // TODO: Implement cm
+void Motor::back(int speed) // TODO: Implement cm
 {
     resetCounter();
     setDirection(false);
-    _expander.setDutyCycle(_controller.PIN_EN, 100);
+    _expander.setDutyCycle(_controller.PIN_EN, speed);
 }
 
-void Motor::stop(bool now) // TODO: Implement now
+void Motor::stop(bool now)
 {
-    _expander.setDutyCycle(_controller.PIN_EN, 0);
-    _expander.setDutyCycle(_controller.PIN_IN1, 0);
-    _expander.setDutyCycle(_controller.PIN_IN2, 0);
+    if (now)
+    {
+        _expander.setDutyCycle(_controller.PIN_EN, _FULL_SPEED);
+        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED);
+        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED);
+    }
+    else
+    {
+        _expander.setDutyCycle(_controller.PIN_EN, _STOP_SPEED);
+        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED);
+        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED);
+    }
 }
 
 void Motor::_incrementCounter()

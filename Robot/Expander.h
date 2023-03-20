@@ -17,6 +17,12 @@
 class Expander
 {
 public:
+    // Public constants
+
+    // Public variables
+
+    // Public methods
+
     /*
      * Constructor for the Expander class.
      *
@@ -41,10 +47,19 @@ public:
     void setDutyCycle(byte channel, byte duty_cycle);
 
 private:
+    // Private constants
+    const static byte _MAX_DUTY_CYCLE = 100; // The maximum duty cycle value
+    const static byte _MIN_DUTY_CYCLE = 0;   // The minimum duty cycle value
+    const static int _MAX_PWM_ON = 4095;     // The maximum PWM on point value
+    const static int _MIN_PWM_ON = 0;        // The minimum PWM on point value
+    const static int _PWM_OFF_POINT = 0;     // The PWM off point value
+
     // Private variables
     byte _address;                  // The I2C address of the expander
     Adafruit_PWMServoDriver _board; // The Adafruit_PWMServoDriver object for controlling the expander
     bool _initialized;              // A boolean indicating whether the expander has been initialized
+
+    // Private methods
 };
 
 #endif
