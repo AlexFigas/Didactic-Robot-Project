@@ -2,9 +2,12 @@
 #define IN2 4
 #define EN 5
 
-#define INTERRUPT_PIN 12
+#define INTERRUPT_PIN 33
 
 volatile int count = 0;
+volatile unsigned long lastInterruptTime = 0;
+
+int lastCount;
 
 void setup()
 {
@@ -12,14 +15,25 @@ void setup()
 
     pinMode(INTERRUPT_PIN, INPUT);
     attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), counter, RISING);
+
+    lastCount = count;
 }
 
 void loop()
 {
-    Serial.println(count);
+    int aux = count;
+    if (aux != lastCount)
+    {
+        lastCount = aux;
+        Serial.println(lastCount);
+    }
 }
 
-void counter()
+IRAM_ATTR void counter()
 {
-    count++;
+    if ((millis() - lastInterruptTime) >= 5)
+    {
+        lastInterruptTime = millis();
+        ++count;
+    }
 }

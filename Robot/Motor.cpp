@@ -16,11 +16,10 @@ void Motor::begin()
 
     pinMode(_controller.interrupt.PIN_DO, INPUT_PULLUP);
 
-    // TODO: Finish no interrupt implementation
     // If the motor has an interrupt
     if (_controller.interrupt.PIN_DO != 0 && _controller.interrupt.INT_COUNT != 0)
     {
-        attachInterrupt(digitalPinToInterrupt(_controller.interrupt.PIN_DO), std::bind(&Motor::_incrementCounter, this), RISING);
+        attachInterrupt(digitalPinToInterrupt(_controller.interrupt.PIN_DO), std::bind(&Motor::_incrementCounter, this), CHANGE);
     }
 }
 
