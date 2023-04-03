@@ -2,7 +2,7 @@
 
 Expander expander = Expander();
 
-MotorController controller1 = MotorController{
+MotorController rightController = MotorController{
     .PIN_EN = 0,
     .PIN_IN1 = 1,
     .PIN_IN2 = 2,
@@ -11,22 +11,34 @@ MotorController controller1 = MotorController{
         .INT_COUNT = 20,
     },
 };
-Motor m1 = Motor(expander, controller1);
+Motor right = Motor(expander, rightController);
+
+MotorController leftController = MotorController{
+    .PIN_EN = 3,
+    .PIN_IN1 = 4,
+    .PIN_IN2 = 5,
+    .interrupt = Interrupt{
+        .PIN_DO = 32,
+        .INT_COUNT = 20,
+    },
+};
+Motor left = Motor(expander, leftController);
 
 void setup()
 {
-    Serial.begin(9600);
-    while (!Serial)
-        ;
+    right.begin();
+    left.begin();
 
-    m1.begin();
-    m1.front(100);
+    right.front(100);
+    delay(50);
+    left.front(100);
 }
 
 void loop()
 {
-    if (m1.getCounter() >= 40)
+    if (right.getCounter() >= 40 || left.getCounter() >= 40)
     {
-        m1.stop(true);
+        right.stop(true);
+        left.stop(true);
     }
 }

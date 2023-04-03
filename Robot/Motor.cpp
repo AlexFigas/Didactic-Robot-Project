@@ -14,11 +14,11 @@ void Motor::begin()
     _expander.setDutyCycle(_controller.PIN_EN, 0);
     setDirection(true);
 
-    pinMode(_controller.interrupt.PIN_DO, INPUT_PULLUP);
-
+    _hasInterrupt = _controller.interrupt.INT_COUNT > 0;
     // If the motor has an interrupt
-    if (_controller.interrupt.PIN_DO != 0 && _controller.interrupt.INT_COUNT != 0)
+    if (_hasInterrupt)
     {
+        pinMode(_controller.interrupt.PIN_DO, INPUT_PULLUP);
         attachInterrupt(digitalPinToInterrupt(_controller.interrupt.PIN_DO), std::bind(&Motor::_incrementCounter, this), CHANGE);
     }
 }
@@ -37,18 +37,26 @@ void Motor::setDirection(bool clockwise)
     }
 }
 
-void Motor::front(int speed) // TODO: Implement cm
+void Motor::front(int speed, float cm)
 {
-    resetCounter();
+    if (_hasInterrupt && cm > 0)
+    {
+        resetCounter();
+        _cmToInterruptCount(cm, _controller.wheelDiameter);
+    }
     setDirection(true);
-    _expander.setDutyCycle(_controller.PIN_EN, speed);
+    setSpeed(speed);
 }
 
-void Motor::back(int speed) // TODO: Implement cm
+void Motor::back(int speed, float cm)
 {
-    resetCounter();
+    if (_hasInterrupt && cm > 0)
+    {
+        resetCounter();
+        _cmToInterruptCount(cm, _controller.wheelDiameter);
+    }
     setDirection(false);
-    _expander.setDutyCycle(_controller.PIN_EN, speed);
+    setSpeed(speed);
 }
 
 void Motor::stop(bool now)
@@ -72,7 +80,7 @@ void Motor::_incrementCounter()
     ++_counter;
 }
 
-int Motor::getCounter()
+int Motor::getCounter() // TODO: depois apagar, só para testar
 {
     return _counter;
 }
@@ -80,4 +88,16 @@ int Motor::getCounter()
 void Motor::resetCounter()
 {
     _counter = 0;
+}
+
+void Motor::setSpeed(int speed)
+{
+    _expander.setDutyCycle(_controller.PIN_EN, speed);
+}
+
+void Motor::_cmToInterruptCount(float cm, int wheelDiameter)
+{
+    float perimeter = wheelDiameter * PI;
+    float rotations = cm / perimeter;
+    _interruptCount = floor(rotations * (_controller.interrupt.INT_COUNT * 2));
 }

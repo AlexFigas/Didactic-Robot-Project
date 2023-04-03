@@ -9,6 +9,7 @@
 
 #include <Arduino.h>
 #include "Expander.h"
+#include <Math.h>
 #include <FunctionalInterrupt.h>
 
 /*
@@ -29,6 +30,7 @@ struct MotorController
     byte PIN_IN1;        // Input 1 pin for the motor controller
     byte PIN_IN2;        // Input 2 pin for the motor controller
     Interrupt interrupt; // Interrupt configuration for the motor controller
+    int wheelDiameter;   // Wheel diameter in centimeters
 };
 
 /*
@@ -49,7 +51,7 @@ public:
      * @param expander - An optional Expander object for expanding the available GPIO pins.
      * @param controller - An optional MotorController object for configuring the motor controller.
      */
-    Motor(Expander expander = Expander(), MotorController controller = MotorController());
+    Motor(Expander expander, MotorController controller);
 
     /*
      * Initializes the motor and motor controller pins.
@@ -70,22 +72,26 @@ public:
      *
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
+     * @param cm - An optional float indicating the distance to travel in centimeters.
+     *             Defaults to 0.
      */
-    void front(int speed);
+    void front(int speed, float cm = 0);
 
     /*
      * Starts the motor in the backward direction.
      *
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
+     * @param cm - An optional float indicating the distance to travel in centimeters.
+     *             Defaults to 0.
      */
-    void back(int speed);
+    void back(int speed, float cm = 0);
 
     /*
      * Stops the motor.
      *
      * @param now - A boolean indicating whether to stop the motor immediately (true) or coast to a stop (false).
-     *              Defaults to 0x40
+     *              Defaults to false.
      */
     void stop(bool now = false);
 
@@ -101,6 +107,14 @@ public:
      */
     void resetCounter();
 
+    /*
+     * Sets the speed of the motor.
+     *
+     * @param speed - An integer indicating the speed of the motor.
+     *                Must be between 0 and 100.
+     */
+    void setSpeed(int speed);
+
 private:
     // Private constants
     static const int _FULL_SPEED = 100; // The maximum speed value
@@ -111,6 +125,8 @@ private:
     Interrupt _interrupt;        // The Interrupt object for configuring the interrupt
     MotorController _controller; // The MotorController object for configuring the motor controller
     volatile int _counter;       // The interrupt counter for the motor
+    int _interruptCount;         // Interrupt count for the motor
+    int _hasInterrupt;           // Flag for interrupt mode
 
     // Private methods
 
@@ -119,6 +135,11 @@ private:
      * This method should not be called directly.
      */
     IRAM_ATTR void _incrementCounter();
+
+    /*
+     * Converts centimeters to interrupt counts.
+     */
+    void _cmToInterruptCount(float cm, int wheelDiameter);
 };
 
 #endif
