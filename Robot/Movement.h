@@ -6,33 +6,25 @@
 class Movement
 {
 public:
-    struct TwoMotors
-    {
-        Motor left;
-        Motor right;
-    };
-
-    struct FourMotors
-    {
-        Motor frontLeft;
-        Motor frontRight;
-        Motor backLeft;
-        Motor backRight;
-    };
-
-    Movement(TwoMotors motors, int wheelbase);
-    Movement(FourMotors motors, int wheelbase);
+    Movement(Motor *motors, int wheelbase);
 
     void begin();
 
     void front(int speed);
     void back(int speed);
-    void left(int radius, int angle, int speed);
-    void right(int radius, int angle, int speed);
     void stop(bool now);
 
+    virtual void left(int radius, int angle, int speed) = 0;
+    virtual void right(int radius, int angle, int speed)= 0;
+
+    int getWheelbase();
+    Motor *getMotors();
+
+protected:
+    int _numMotors;
+
 private:
-    Motor *_motors;
     int _wheelbase; // cm (distance between wheels)
+    Motor *_motors;
 };
 #endif
