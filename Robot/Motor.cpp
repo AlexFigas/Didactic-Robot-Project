@@ -44,6 +44,7 @@ void Motor::front(int speed, float cm)
         resetCounter();
         _cmToInterruptCount(cm, _controller.wheelDiameter);
     }
+
     setDirection(true);
     setSpeed(speed);
 }
