@@ -6,10 +6,14 @@
 class MovementTwoMotors : public Movement
 {
 public:
-    MovementTwoMotors(Motor *motors, int wheelbase);
+    MovementTwoMotors(Motor *motors, float wheelbase, float wheelRadius);
 
     void left(int radius, int angle, int speed) override;
     void right(int radius, int angle, int speed) override;
+
+private:
+
+    void _calculateSpeedDistance(bool leftMotor, int radius, int angle, int speed, float* finalSpeed, float* finalDistance);
 };
 
 #endif

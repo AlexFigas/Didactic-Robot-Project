@@ -1,6 +1,6 @@
 #include "MovementTwoMotors.h"
 
-MovementTwoMotors::MovementTwoMotors(Motor *motors, int wheelbase) : Movement(motors, wheelbase)
+MovementTwoMotors::MovementTwoMotors(Motor *motors, float wheelbase, float wheelRadius) : Movement(motors, wheelbase, wheelRadius)
 {
     _numMotors = 2;
 }
@@ -15,31 +15,17 @@ void MovementTwoMotors::left(int radius, int angle, int speed)
     {
         if (angle > 0)
         {
+            // Variables
+            float leftSpeed, rightSpeed;
+            float leftDistance, rightDistance;
 
-            // Distance and time it takes the center of the robot to reach
-            float distance = (2 * PI * radius * angle) / 360;
-            float time = distance / speed;
+            // Calculation ​
+            _calculateSpeedDistance(true, radius, angle, speed, &leftSpeed, &leftDistance);
+            _calculateSpeedDistance(false, radius, angle, speed, &rightSpeed, &rightDistance); 
 
-            // Speed ​​calculation for the left motor
-            float leftDistance = (2 * PI * (radius - (getWheelbase() / 2)) * angle) / 360;
-            float leftSpeed = leftDistance / time;
-
-            // Speed ​​calculation for the right motor
-            float rightDistance = (2 * PI * (radius + (getWheelbase() / 2)) * angle) / 360;
-            float rightSpeed = rightDistance / time;
-
-            // In case the speed exceeds the scale values [0 - 100]
-            float delta = rightSpeed - 100;
-
-            if (delta > 0)
-            {
-                leftSpeed -= delta;
-                rightSpeed -= delta;
-            }
-
-            // Set the direction and speed of each motor to turn in the appropriate direction to make the robot move in a leftward curve. This can be done by using the setDirection() method of the Motor class and passing in the appropriate direction (e.g., forward for the left motors and backward for the right motors).
+            // Activate motors
             getMotors()[0].front(leftSpeed, leftDistance);
-            delay(50);
+            delay(_DELAY_MOTORS);
             getMotors()[1].front(rightSpeed, rightDistance);
         }
         else
@@ -59,36 +45,51 @@ void MovementTwoMotors::right(int radius, int angle, int speed)
     {
         if (angle > 0)
         {
+            // Variables
+            float leftSpeed, rightSpeed;
+            float leftDistance, rightDistance;
 
-            // Distance and time it takes the center of the robot to reach
-            float distance = (2 * PI * radius * angle) / 360;
-            float time = distance / speed;
+            // Calculation ​
+            _calculateSpeedDistance(false, radius, angle, speed, &leftSpeed, &leftDistance);
+            _calculateSpeedDistance(true, radius, angle, speed, &rightSpeed, &rightDistance); 
 
-            // Speed ​​calculation for the left motor
-            float leftDistance = (2 * PI * (radius + (getWheelbase() / 2)) * angle) / 360;
-            float leftSpeed = leftDistance / time;
-
-            // Speed ​​calculation for the right motor
-            float rightDistance = (2 * PI * (radius - (getWheelbase() / 2)) * angle) / 360;
-            float rightSpeed = rightDistance / time;
-
-            // In case the speed exceeds the scale values [0 - 100]
-            float delta = leftSpeed - 100;
-
-            if (delta > 0)
-            {
-                leftSpeed -= delta;
-                rightSpeed -= delta;
-            }
-
-            // Set the direction and speed of each motor to turn in the appropriate direction to make the robot move in a rightward curve. This can be done by using the setDirection() method of the Motor class and passing in the appropriate direction (e.g., forward for the right motors and backward for the left motors).
-            getMotors()[0].front(rightSpeed, rightDistance);
-            delay(50);
-            getMotors()[1].front(leftSpeed, leftDistance);
+            // Activate motors
+            getMotors()[0].front(leftSpeed, leftDistance);
+            delay(_DELAY_MOTORS);
+            getMotors()[1].front(rightSpeed, rightDistance);
         }
         else
         {
             // TODO
         }
     }
+}
+
+void MovementTwoMotors::_calculateSpeedDistance(bool leftMotor, int radius, int angle, int speed, float* finalSpeed, float* finalDistance)
+{
+    // RobotRadius
+    float robotRadius = getWheelbase() / 2;
+    robotRadius = (leftMotor) ? -robotRadius : robotRadius;
+
+    // Wheel perimeter
+    float wheelPerimeter = getWheelRadius() * 2.0 * PI;
+
+    // Multiply the input speed by the maximum speed value
+    float inputVelocity = speed * _MAX_SPEED;
+
+    // RPM to RPS conversion
+    float velocityRPS = inputVelocity * wheelPerimeter / 60.0;
+
+    // RPS to cm/s conversion
+    float velocitycms = velocityRPS / 100.0;
+
+    // Velocity
+    float velocityWheel = velocitycms * (2.0 + robotRadius / radius) / 2.0;
+
+    // Time to do the required angle
+    float time = angle * PI / 180.0 / velocitycms;
+
+    // Final speed and distance
+    *finalSpeed = velocityWheel / _MAX_SPEED * 100.0;
+    *finalDistance = velocityWheel * time;
 }

@@ -30,7 +30,7 @@ struct MotorController
     byte PIN_IN1;        // Input 1 pin for the motor controller
     byte PIN_IN2;        // Input 2 pin for the motor controller
     Interrupt interrupt; // Interrupt configuration for the motor controller
-    int wheelDiameter;   // Wheel diameter in centimeters
+    int wheelRadius;     // Wheel radius in centimeters
 };
 
 /*
@@ -114,6 +114,16 @@ public:
      *                Must be between 0 and 100.
      */
     void setSpeed(int speed);
+    
+    /*
+     * Get the target interrupt.
+     */
+    int getTargetInterrupt();
+
+    /**
+     * Check if the motor has a interrupt.
+     */
+    bool hasInterrupt();
 
 private:
     // Private constants
@@ -125,11 +135,10 @@ private:
     Interrupt _interrupt;        // The Interrupt object for configuring the interrupt
     MotorController _controller; // The MotorController object for configuring the motor controller
     volatile int _counter;       // The interrupt counter for the motor
-    int _interruptCount;         // Interrupt count for the motor
+    int _interruptTarget;        // Interrupt target for the motor
     int _hasInterrupt;           // Flag for interrupt mode
 
     // Private methods
-
     /*
      * Interrupt service routine for counting interrupts.
      * This method should not be called directly.
@@ -137,9 +146,9 @@ private:
     IRAM_ATTR void _incrementCounter();
 
     /*
-     * Converts centimeters to interrupt counts.
+     * Convert the lenght (cm) to number of interrupts and updates the interrupt target.
      */
-    void _cmToInterruptCount(float cm, int wheelDiameter);
+    void _updateInterruptTarget(float length);
 };
 
 #endif

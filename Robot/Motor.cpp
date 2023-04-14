@@ -15,6 +15,7 @@ void Motor::begin()
     setDirection(true);
 
     _hasInterrupt = _controller.interrupt.INT_COUNT > 0;
+
     // If the motor has an interrupt
     if (_hasInterrupt)
     {
@@ -37,25 +38,26 @@ void Motor::setDirection(bool clockwise)
     }
 }
 
-void Motor::front(int speed, float cm)
+void Motor::front(int speed, float length)
 {
-    if (_hasInterrupt && cm > 0)
-    {
+    if (_hasInterrupt && length > 0)
+    {    
         resetCounter();
-        _cmToInterruptCount(cm, _controller.wheelDiameter);
+        _updateInterruptTarget(length);
     }
 
     setDirection(true);
     setSpeed(speed);
 }
 
-void Motor::back(int speed, float cm)
+void Motor::back(int speed, float length)
 {
-    if (_hasInterrupt && cm > 0)
-    {
+    if (_hasInterrupt && length > 0)
+    {    
         resetCounter();
-        _cmToInterruptCount(cm, _controller.wheelDiameter);
+        _updateInterruptTarget(length);
     }
+
     setDirection(false);
     setSpeed(speed);
 }
@@ -96,9 +98,19 @@ void Motor::setSpeed(int speed)
     _expander.setDutyCycle(_controller.PIN_EN, speed);
 }
 
-void Motor::_cmToInterruptCount(float cm, int wheelDiameter)
+bool Motor::hasInterrupt()
 {
-    float perimeter = wheelDiameter * PI;
-    float rotations = cm / perimeter;
-    _interruptCount = floor(rotations * (_controller.interrupt.INT_COUNT * 2));
+    return _hasInterrupt;
+}
+
+int Motor::getTargetInterrupt()
+{
+    return _interruptTarget;
+}
+
+void Motor::_updateInterruptTarget(float length)
+{
+    float perimeter = 2 * _controller.wheelRadius * PI;
+    float rotations = length / perimeter;
+    _interruptTarget = floor(rotations * (_controller.interrupt.INT_COUNT * 2));
 }
