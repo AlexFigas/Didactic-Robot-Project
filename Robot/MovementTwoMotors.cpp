@@ -1,6 +1,6 @@
 #include "MovementTwoMotors.h"
 
-MovementTwoMotors::MovementTwoMotors(Motor *motors, float wheelbase, float wheelRadius) : Movement(motors, wheelbase, wheelRadius)
+MovementTwoMotors::MovementTwoMotors(Motor *motors, float track, float wheelRadius) : Movement(motors, track, wheelRadius)
 {
     _numMotors = 2;
 }
@@ -65,31 +65,31 @@ void MovementTwoMotors::right(int radius, int angle, int speed)
     }
 }
 
-void MovementTwoMotors::_calculateSpeedDistance(bool leftMotor, int radius, int angle, int speed, float* finalSpeed, float* finalDistance)
+void MovementTwoMotors::_calculateSpeedDistance(bool innerWheel, int radius, int angle, int speed, float* finalSpeed, float* finalDistance)
 {
-    // RobotRadius
-    float robotRadius = getWheelbase() / 2;
-    robotRadius = (leftMotor) ? -robotRadius : robotRadius;
+    // RobotRadius (Track / 2)
+    float robotRadius = getTrack() / 2;
+    robotRadius = (innerWheel) ? -robotRadius : robotRadius;
 
-    // Wheel perimeter
+    // Wheel perimeter (Distance in cm in one turn of the wheel)
     float wheelPerimeter = getWheelRadius() * 2.0 * PI;
 
-    // Multiply the input speed by the maximum speed value
-    float inputVelocity = speed * _MAX_SPEED;
+    // Speed in cm/s of the robot wheel in one revolution per minute (RPM). This calculation
+    // is necessary because the speed scale passed as a parameter (speed) is a fraction of the
+    // maximum allowed speed and is not directly related to the actual speed of the robot wheel.
+    float velocity = speed * _MAX_SPEED;
+    velocity = velocity * wheelPerimeter / 60.0;
 
-    // RPM to RPS conversion
-    float velocityRPS = inputVelocity * wheelPerimeter / 60.0;
+    // Convert the speed scale from 0 to 100 to a decimal fraction between 0 and 1,
+    // which is multiplied by the robot's maximum speed to get the actual speed in cm/s
+    velocity = velocity / _MAX_SPEED;
 
-    // RPS to cm/s conversion
-    float velocitycms = velocityRPS / 100.0;
+    // Average linear speed of the wheels
+    // (The velocity of the outer wheel is equal to velocity variable value)
+    float velocityWheel = velocity * (2.0 + robotRadius / radius) / 2;
+    float time = angle * PI / 180.0 / velocity;
 
-    // Velocity
-    float velocityWheel = velocitycms * (2.0 + robotRadius / radius) / 2.0;
-
-    // Time to do the required angle
-    float time = angle * PI / 180.0 / velocitycms;
-
-    // Final speed and distance
     *finalSpeed = velocityWheel / _MAX_SPEED * 100.0;
     *finalDistance = velocityWheel * time;
 }
+

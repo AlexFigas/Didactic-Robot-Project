@@ -75,7 +75,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void front(int speed, float cm = 0);
+    void front(float speed, float length = 0);
 
     /*
      * Starts the motor in the backward direction.
@@ -113,7 +113,7 @@ public:
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
      */
-    void setSpeed(int speed);
+    void setSpeed(float speed);
     
     /*
      * Get the target interrupt.

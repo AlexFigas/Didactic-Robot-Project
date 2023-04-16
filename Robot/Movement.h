@@ -6,7 +6,7 @@
 class Movement
 {
 public:
-    Movement(Motor *motors, float wheelbase, float wheelRadius);
+    Movement(Motor *motors, float track, float wheelRadius);
 
     void begin();
 
@@ -17,7 +17,7 @@ public:
     virtual void left(int radius, int angle, int speed) = 0;
     virtual void right(int radius, int angle, int speed) = 0;
 
-    float getWheelbase();
+    float getTrack();
     float getWheelRadius();
     Motor *getMotors();
 
@@ -29,7 +29,7 @@ protected:
 private:
     void _waitForTargetInterrupt();
 
-    float _wheelbase;   // Distance between wheels (cm)
+    float _track;   // Distance between wheels (cm)
     float _wheelRadius; // Wheel radius (cm)
     Motor *_motors;
 };

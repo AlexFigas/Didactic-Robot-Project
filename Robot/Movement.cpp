@@ -1,9 +1,9 @@
 #include "Movement.h"
 
-Movement::Movement(Motor *motors, float wheelbase, float wheelRadius)
+Movement::Movement(Motor *motors, float track, float wheelRadius)
 {
     _motors = motors;
-    _wheelbase = wheelbase;
+    _track = track;
     _wheelRadius = wheelRadius;
 }
 
@@ -12,9 +12,9 @@ Motor *Movement::getMotors()
     return _motors;
 }
 
-float Movement::getWheelbase()
+float Movement::getTrack()
 {
-    return _wheelbase;
+    return _track;
 }
 
 float Movement::getWheelRadius()

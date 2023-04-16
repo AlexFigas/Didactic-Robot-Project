@@ -38,7 +38,7 @@ void Motor::setDirection(bool clockwise)
     }
 }
 
-void Motor::front(int speed, float length)
+void Motor::front(float speed, float length)
 {
     if (_hasInterrupt && length > 0)
     {    
@@ -93,7 +93,7 @@ void Motor::resetCounter()
     _counter = 0;
 }
 
-void Motor::setSpeed(int speed)
+void Motor::setSpeed(float speed)
 {
     _expander.setDutyCycle(_controller.PIN_EN, speed);
 }
