@@ -2,6 +2,8 @@
 #define MOVEMENTTWOMOTORS_H
 
 #include "Movement.h"
+#include <iostream>
+#include <cmath>
 
 class MovementTwoMotors : public Movement
 {

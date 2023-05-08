@@ -15,18 +15,32 @@ void MovementTwoMotors::left(int radius, int angle, int speed)
     {
         if (angle > 0)
         {
-            // Variables
-            float leftSpeed, rightSpeed;
-            float leftDistance, rightDistance;
+            // Distance and time it takes the center of the robot to reach
+            float distance = (2 * PI * radius * angle) / 360;
+            float time = distance / speed;
 
-            // Calculation ​
-            _calculateSpeedDistance(true, radius, angle, speed, &leftSpeed, &leftDistance);
-            _calculateSpeedDistance(false, radius, angle, speed, &rightSpeed, &rightDistance); 
+            // Speed ​​calculation for the inner motor
+            float leftDistance = (2 * PI * (radius - (getTrack() / 2)) * angle) / 360;
+            float leftSpeed = leftDistance / time;
+
+            float rightDistance = (2 * PI * (radius + (getTrack() / 2)) * angle) / 360;
+            float rightSpeed = rightDistance / time;
+
+            // Force the minimum speed to be equal to _MAX_SPEED / 2
+            float offset = 0;
+            if (leftSpeed < (_MAX_SPEED / 2))
+            {
+                offset = (_MAX_SPEED / 2) - leftSpeed;
+            }
+            else if (rightSpeed < (_MAX_SPEED / 2))
+            {
+                offset = (_MAX_SPEED / 2) - rightSpeed;
+            }
 
             // Activate motors
-            getMotors()[0].front(leftSpeed, leftDistance);
+            getMotors()[0].front(leftSpeed + offset, leftDistance);
             delay(_DELAY_MOTORS);
-            getMotors()[1].front(rightSpeed, rightDistance);
+            getMotors()[1].front(rightSpeed + offset, rightDistance);
         }
         else
         {
@@ -45,18 +59,31 @@ void MovementTwoMotors::right(int radius, int angle, int speed)
     {
         if (angle > 0)
         {
-            // Variables
-            float leftSpeed, rightSpeed;
-            float leftDistance, rightDistance;
+            // Distance and time it takes the center of the robot to reach
+            float distance = (2 * PI * radius * angle) / 360;
+            float time = distance / speed;
 
-            // Calculation ​
-            _calculateSpeedDistance(false, radius, angle, speed, &leftSpeed, &leftDistance);
-            _calculateSpeedDistance(true, radius, angle, speed, &rightSpeed, &rightDistance); 
+            // Speed ​​calculation for the inner motor
+            float leftDistance = (2 * PI * (radius + (getTrack() / 2)) * angle) / 360;
+            float leftSpeed = leftDistance / time;
+
+            float rightDistance = (2 * PI * (radius - (getTrack() / 2)) * angle) / 360;
+            float rightSpeed = rightDistance / time;
+
+            float offset = 0;
+            if (leftSpeed < (_MAX_SPEED / 2))
+            {
+                offset = (_MAX_SPEED / 2) - leftSpeed;
+            }
+            else if (rightSpeed < (_MAX_SPEED / 2))
+            {
+                offset = (_MAX_SPEED / 2) - rightSpeed;
+            }
 
             // Activate motors
-            getMotors()[0].front(leftSpeed, leftDistance);
+            getMotors()[0].front(leftSpeed + offset, leftDistance);
             delay(_DELAY_MOTORS);
-            getMotors()[1].front(rightSpeed, rightDistance);
+            getMotors()[1].front(rightSpeed + offset, rightDistance);
         }
         else
         {
@@ -65,31 +92,27 @@ void MovementTwoMotors::right(int radius, int angle, int speed)
     }
 }
 
+/*
+// Distance and time it takes the center of the robot to reach
+float distance = (2 * M_PI * radius * angle) / 360;
+float time = distance / speed;
+
+// Maximum speed for each motor
+float maxSpeed = 100; // adjust as needed
+
+// Speed ​​calculation for the left motor
+float leftDistance = (2 * M_PI * (radius - (_wheelbase / 2)) * angle) / 360;
+float leftSpeed = (leftDistance / time) / maxSpeed * speed;
+
+// Speed ​​calculation for the right motor
+float rightDistance = (2 * M_PI * (radius + (_wheelbase / 2)) * angle) / 360;
+float rightSpeed = (rightDistance / time) / maxSpeed * speed;
+*/
+
 void MovementTwoMotors::_calculateSpeedDistance(bool innerWheel, int radius, int angle, int speed, float* finalSpeed, float* finalDistance)
 {
-    // RobotRadius (Track / 2)
-    float robotRadius = getTrack() / 2;
-    robotRadius = (innerWheel) ? -robotRadius : robotRadius;
 
-    // Wheel perimeter (Distance in cm in one turn of the wheel)
-    float wheelPerimeter = getWheelRadius() * 2.0 * PI;
 
-    // Speed in cm/s of the robot wheel in one revolution per minute (RPM). This calculation
-    // is necessary because the speed scale passed as a parameter (speed) is a fraction of the
-    // maximum allowed speed and is not directly related to the actual speed of the robot wheel.
-    float velocity = speed * _MAX_SPEED;
-    velocity = velocity * wheelPerimeter / 60.0;
 
-    // Convert the speed scale from 0 to 100 to a decimal fraction between 0 and 1,
-    // which is multiplied by the robot's maximum speed to get the actual speed in cm/s
-    velocity = velocity / _MAX_SPEED;
-
-    // Average linear speed of the wheels
-    // (The velocity of the outer wheel is equal to velocity variable value)
-    float velocityWheel = velocity * (2.0 + robotRadius / radius) / 2;
-    float time = angle * PI / 180.0 / velocity;
-
-    *finalSpeed = velocityWheel / _MAX_SPEED * 100.0;
-    *finalDistance = velocityWheel * time;
 }
 
