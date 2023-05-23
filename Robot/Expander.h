@@ -44,7 +44,7 @@ public:
      * @param duty_cycle - A byte indicating the duty cycle to set.
      *                     Must be between 0 and 100.
      */
-    void setDutyCycle(byte channel, byte duty_cycle);
+    void setDutyCycle(byte channel, float duty_cycle);
 
 private:
     // Private constants

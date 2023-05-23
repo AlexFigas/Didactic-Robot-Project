@@ -30,7 +30,7 @@ struct MotorController
     byte PIN_IN1;        // Input 1 pin for the motor controller
     byte PIN_IN2;        // Input 2 pin for the motor controller
     Interrupt interrupt; // Interrupt configuration for the motor controller
-    int wheelDiameter;   // Wheel diameter in centimeters
+    int wheelRadius;     // Wheel radius in centimeters
 };
 
 /*
@@ -75,7 +75,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void front(int speed, float cm = 0);
+    void front(float speed, float length = 0);
 
     /*
      * Starts the motor in the backward direction.
@@ -95,6 +95,9 @@ public:
      */
     void stop(bool now = false);
 
+    void slow();
+    void block();
+
     /*
      * Gets the current interrupt count.
      *
@@ -113,23 +116,42 @@ public:
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
      */
-    void setSpeed(int speed);
+    void setSpeed(float speed);
+    
+    /*
+     * Get the target interrupt.
+     */
+    int getTargetInterrupt();
+
+    /**
+     * Check if the motor has a interrupt.
+     */
+    bool hasInterrupt();
+
+    float getRadius();
+
+    float getPerimeter();
 
 private:
     // Private constants
-    static const int _FULL_SPEED = 100; // The maximum speed value
-    static const int _STOP_SPEED = 0;   // The minimum speed value
+    static const int _FULL_SPEED = 100;  // The maximum speed value
+    static const int _STOP_SPEED = 0;    // The minimum speed value
+    static const int _INTERRUPT_FIX = 2; // Multiplicative constant for interrupt attach on change
 
     // Private variables
     Expander _expander;          // The Expander object for expanding the available GPIO pins
     Interrupt _interrupt;        // The Interrupt object for configuring the interrupt
     MotorController _controller; // The MotorController object for configuring the motor controller
+
     volatile int _counter;       // The interrupt counter for the motor
-    int _interruptCount;         // Interrupt count for the motor
+    int _turnInterruptCount;
+    int _interruptTarget;        // Interrupt target for the motor
     int _hasInterrupt;           // Flag for interrupt mode
 
-    // Private methods
+    float _perimeter;            // Wheel perimeter (cm)
+    float _radius;
 
+    // Private methods
     /*
      * Interrupt service routine for counting interrupts.
      * This method should not be called directly.
@@ -137,9 +159,9 @@ private:
     IRAM_ATTR void _incrementCounter();
 
     /*
-     * Converts centimeters to interrupt counts.
+     * Convert the lenght (cm) to number of interrupts and updates the interrupt target.
      */
-    void _cmToInterruptCount(float cm, int wheelDiameter);
+    void _updateInterruptTarget(float length);
 };
 
 #endif
