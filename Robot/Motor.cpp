@@ -10,13 +10,14 @@ Motor::Motor(Expander expander, MotorController controller)
 
     _turnInterruptCount = _controller.interrupt.INT_COUNT * _INTERRUPT_FIX;
     _counter = 0;
+    _speed = 0;
 }
 
 void Motor::begin()
 {
     // Set initial direction
     _expander.begin();
-    _expander.setDutyCycle(_controller.PIN_EN, 0);
+    _expander.setDutyCycle(_controller.PIN_EN, 0, true);
     setDirection(true);
 
     _hasInterrupt = _controller.interrupt.INT_COUNT > 0;
@@ -33,17 +34,17 @@ void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
     {      
-        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Clockwise
-        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED, true); // Clockwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED, true); // Counterclockwise
     }
     else
     {
-        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED); // Clockwise
-        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED, true); // Clockwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED, true); // Counterclockwise
     }
 }
 
-void Motor::front(float speed, float length)
+void Motor::front(int speed, float length)
 {
     if (_hasInterrupt && length > 0)
     {    
@@ -67,13 +68,13 @@ void Motor::back(int speed, float length)
 
 void Motor::slow()
 {
-    _expander.setDutyCycle(_controller.PIN_EN, _STOP_SPEED);
+    _expander.setDutyCycle(_controller.PIN_EN, _STOP_SPEED, true);
 }
 
 void Motor::block()
 {
-    _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED);
-    _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED);       
+    _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED, true);
+    _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED, true);
 }
 
 void Motor::stop(bool now)
@@ -107,9 +108,15 @@ void Motor::resetCounter()
     _counter = 0;
 }
 
-void Motor::setSpeed(float speed)
+void Motor::setSpeed(int speed)
 {
-    _expander.setDutyCycle(_controller.PIN_EN, speed);
+    _speed = speed;
+    _expander.setDutyCycle(_controller.PIN_EN, _speed);
+}
+
+int Motor::getSpeed()
+{
+    return _speed;
 }
 
 bool Motor::hasInterrupt()
@@ -131,15 +138,6 @@ float Motor::getRadius()
 {
     return _radius;
 }
-
-/*int Motor::getRPM(long duration)
-{  
-    float timeInSeconds = duration / 1000.0;
-    float turns = _counter / _turnInterruptCount;
-    int rpm = int(turns / timeInSeconds * 60);
-
-    return rpm;
-}*/
 
 void Motor::_updateInterruptTarget(float length)
 {

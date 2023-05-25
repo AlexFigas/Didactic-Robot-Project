@@ -75,7 +75,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void front(float speed, float length = 0);
+    void front(int speed, float length = 0);
 
     /*
      * Starts the motor in the backward direction.
@@ -116,7 +116,8 @@ public:
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
      */
-    void setSpeed(float speed);
+    void setSpeed(int speed);
+    int getSpeed();
     
     /*
      * Get the target interrupt.
@@ -130,7 +131,7 @@ public:
 
     float getRadius();
 
-    float getPerimeter();
+    float getPerimeter();    
 
 private:
     // Private constants
@@ -150,6 +151,7 @@ private:
 
     float _perimeter;            // Wheel perimeter (cm)
     float _radius;
+    int _speed;    
 
     // Private methods
     /*

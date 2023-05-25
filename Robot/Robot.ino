@@ -34,13 +34,13 @@ MovementTwoMotors movement = MovementTwoMotors(new Motor[2]{left, right}, track,
 
 String command;
 
+/*
 void processCommand(String cmd) {
+
     int speed = cmd.toInt();
     
-    //movement.line(speed, 100.0);
-    right.front( speed, 100 );
-
-    unsigned long finalTime = millis()+10000;
+    movement.line(speed, 100.0);
+    unsigned long finalTime = millis()+5000;
 
     while ( millis()<finalTime ) 
       ;
@@ -51,62 +51,87 @@ void processCommand(String cmd) {
     char stringByte[80];
     Motor * motors = movement.getMotors();
 
-    while ( millis()< (finalTime+1000) ) 
+    while ( millis()< (finalTime+250) ) 
       ;
 
     sprintf(stringByte, "%d;%d", motors[0].getCounter(), motors[1].getCounter() );
-
     SerialBT.println( stringByte );
 
     movement.reset();
-}
+}*/
 
 void setup()
 {
-    Serial.begin(9600);
     command = "";
-    movement.begin();
-    SerialBT.begin("Robot"); // Serial Bluetooth initialization
 
-/*
+    // Serial and Bluetooth communication
+    Serial.begin(9600);
+    SerialBT.begin("Robot"); 
     movement.begin();
-    movement.line(25.0, 100.0);
-    delay(5000);
-    movement.line(50.0, 100.0);
-    delay(5000);
-    movement.line(25.0, 100.0, false);
-    delay(5000);
-    movement.line(50.0, 100.0, false);
-    */
 }
 
 void loop()
 {
-    // Ao receber algo pelo bluetooth
+    // Receiving bluetooth messages
     if (SerialBT.available()) 
     {
         command = SerialBT.readStringUntil('\n');
-        processCommand( command );
+        processMessage(command);
         command = "";
+    }
+}
 
-        /*if ( currentChar=='\n' ) {
-            processCommand( command );
-            command = "";
+void processMessage(String msg) {
+
+    // First char - type of movement
+    char movementType = msg.charAt(0);
+
+    // Check if the movement is valid
+    if (movementType == 'f' || movementType == 'b' || movementType == 'l' || movementType == 'r') {
+
+        // Commas separator
+        int separator1 = msg.indexOf(',');
+        int separator2 = msg.indexOf(',', separator1 + 1);
+        
+        if (separator1 != -1 && separator2 != -1)
+        {
+            // Speed and first parameter
+            int speed = msg.substring(separator1 + 1, separator2).toInt(); 
+            float length = msg.substring(separator2 + 1).toFloat();
+            
+            // Forward
+            if (movementType == 'f')
+            {
+                movement.line(speed, length, true);
+            } 
+            // Backward
+            else if (movementType == 'b')
+            {
+                movement.line(speed, length, false);
+            }
+            // Curve
+            else if (movementType == 'l' || movementType == 'r')
+            {
+                int separator3 = msg.indexOf(',', separator2 + 1);
+
+                if (separator3 != -1) {
+
+                    // Radius and Angle
+                    int radius = msg.substring(separator2 + 1, separator3).toInt();
+                    int angle = msg.substring(separator3 + 1).toInt();
+                
+                    // Left turn
+                    if (movementType == 'l')
+                    {
+                        movement.curve(speed, radius, angle, true);                        
+                    }
+                    // Right turn
+                    else if (movementType == 'r')
+                    {
+                        movement.curve(speed, radius, angle, false);
+                    }
+                }
+            }
         }
-        else {
-            command += currentChar;
-        }*/
     }
-
-  /*if ( Serial.available() ) {
-    char currentChar = (char)Serial.read();
-
-    if ( currentChar=='\n' ) {
-      processCommand( command );
-      command = "";
-    }
-    else {
-      command += currentChar;
-    }
-  }*/
 }

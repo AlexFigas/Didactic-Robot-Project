@@ -5,6 +5,18 @@ MovementTwoMotors::MovementTwoMotors(Motor *motors, float track, float wheelRadi
     _numMotors = 2;
 }
 
+void MovementTwoMotors::curve(int speed, int radius, int angle, bool isLeft)
+{
+    if (isLeft == true)
+    {
+        left(radius, angle, speed);
+    }
+    else 
+    {
+        right(radius, angle, speed);
+    }
+}
+
 void MovementTwoMotors::left(int radius, int angle, int speed)
 {
     if (radius == 0)

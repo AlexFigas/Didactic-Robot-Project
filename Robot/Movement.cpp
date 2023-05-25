@@ -42,13 +42,12 @@ void Movement::line(int speed, float length, bool isFront)
         back(speed, length);
     }
 
-    //_waitForTargetInterrupt(speed);
+    _waitForTargetInterrupt(speed);
     
     // Stops and resets the counters
-    //stop(false);
-    //slow();
-    //block();    
-    //reset();
+    slow();
+    block();    
+    reset();
 }
 
 void Movement::front(int speed, float length)
@@ -57,7 +56,6 @@ void Movement::front(int speed, float length)
     for (int i = 0; i < _numMotors; i++)
     {
         // Start the motor
-        //_motors[i].front(50+speed, length);
         _motors[i].front(speed, length);
     }
 }
@@ -68,7 +66,6 @@ void Movement::back(int speed, float length)
     for (int i = 0; i < _numMotors; i++)
     {
         // Start the motor
-        //_motors[i].back(50+speed, length);
         _motors[i].back(speed, length);
     }
 }
@@ -112,18 +109,16 @@ void Movement::_waitForTargetInterrupt(int speed)
 
     int leftMotorCounter = 0;
     int rightMotorCounter = 0;
-
+    
     unsigned long lastTime = 0;
-
+    unsigned long finalTime = millis()+5000;
+    
     while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
+    //while ( millis()<finalTime ) 
     {
         // Obtem o numero de interrupts atual de cada roda
         leftMotorCounter = _motors[0].getCounter();
         rightMotorCounter = _motors[1].getCounter();     
-
-        /*Serial.print(leftMotorCounter);
-        Serial.print(":");
-        Serial.println(rightMotorCounter);   
 
         // Passado 50ms entra
         unsigned long currentTime = millis();
@@ -135,17 +130,35 @@ void Movement::_waitForTargetInterrupt(int speed)
             {
                 float tickRatio = (float)(leftMotorCounter) / (float)(rightMotorCounter);
 
+                int leftSpeed = _motors[0].getSpeed();
+                int rightSpeed = _motors[1].getSpeed();
+
                 // Deixar o esquerdo mais rapido
+               // Deixar o esquerdo mais rapido / direito mais lento
                 if (tickRatio < 1.0)
                 {
-                    _motors[0].setSpeed(50+speed * tickRatio);
+                    if (leftSpeed + 5 > _MAX_SPEED) 
+                    {
+                        _motors[1].setSpeed(rightSpeed - 1);
+                    }
+                    else
+                    {
+                        _motors[0].setSpeed(leftSpeed + 5);
+                    }                    
                 }
-                // Deixar o esquerdo mais lento 
+                // Deixar o esquerdo mais lento / direito mais rapido
                 else if (tickRatio > 1.0)
                 {
-                    _motors[0].setSpeed(50+speed / tickRatio);
+                    if (rightSpeed + 5 > _MAX_SPEED) 
+                    {
+                        _motors[0].setSpeed(leftSpeed - 1);
+                    }
+                    else
+                    {
+                        _motors[1].setSpeed(rightSpeed + 5);
+                    }   
                 }
             }
-        }*/
+        }
     }
 }
