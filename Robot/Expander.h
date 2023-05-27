@@ -44,7 +44,7 @@ public:
      * @param duty_cycle - A byte indicating the duty cycle to set.
      *                     Must be between 0 and 100.
      */
-    void setDutyCycle(byte channel, int duty_cycle, bool digital = false);
+    void setDutyCycle(byte channel, int duty_cycle);
 
 private:
     // Private constants

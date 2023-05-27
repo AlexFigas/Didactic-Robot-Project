@@ -103,6 +103,27 @@ void processMessage(String msg) {
             if (movementType == 'f')
             {
                 movement.line(speed, length, true);
+
+                /*
+                // Comentar as linhas 45, 48, 49 e 50 para realizar o seguinte teste de 5 segundos                 
+                //  DEBUG - Num de ticks //
+                unsigned long finalTime = millis()+5000;
+                while (millis() < finalTime);
+
+                movement.slow();
+                movement.block();    
+                    
+                char stringByte[80];
+                Motor* motors = movement.getMotors();
+
+                while (millis() < (finalTime + 150));
+
+                sprintf(stringByte, "%d;%d", motors[0].getCounter(), motors[1].getCounter() );
+                SerialBT.println( stringByte );
+
+                movement.reset();
+                //  DEBUG - Num de ticks //
+                */
             } 
             // Backward
             else if (movementType == 'b')

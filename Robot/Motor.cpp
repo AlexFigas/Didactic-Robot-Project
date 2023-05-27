@@ -17,7 +17,7 @@ void Motor::begin()
 {
     // Set initial direction
     _expander.begin();
-    _expander.setDutyCycle(_controller.PIN_EN, 0, true);
+    _expander.setDutyCycle(_controller.PIN_EN, 0);
     setDirection(true);
 
     _hasInterrupt = _controller.interrupt.INT_COUNT > 0;
@@ -34,13 +34,13 @@ void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
     {      
-        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED, true); // Clockwise
-        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED, true); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Clockwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
     }
     else
     {
-        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED, true); // Clockwise
-        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED, true); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED); // Clockwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED); // Counterclockwise
     }
 }
 
@@ -68,13 +68,13 @@ void Motor::back(int speed, float length)
 
 void Motor::slow()
 {
-    _expander.setDutyCycle(_controller.PIN_EN, _STOP_SPEED, true);
+    _expander.setDutyCycle(_controller.PIN_EN, _STOP_SPEED);
 }
 
 void Motor::block()
 {
-    _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED, true);
-    _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED, true);
+    _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED);
+    _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED);
 }
 
 void Motor::stop(bool now)
@@ -109,8 +109,8 @@ void Motor::resetCounter()
 }
 
 void Motor::setSpeed(int speed)
-{
-    _speed = speed;
+{ 
+    _speed = speed > 100 ? 100 : (speed < 50 ? 50 : speed);
     _expander.setDutyCycle(_controller.PIN_EN, _speed);
 }
 
