@@ -13,6 +13,7 @@ Motor::Motor(Expander expander, MotorController controller)
     _counter = 0;
     _speed = 0.0;
     _offset = 0.0;
+    _pwm = 0;
 }
 
 void Motor::begin()
@@ -134,7 +135,18 @@ void Motor::setSpeed(float speed)
 { 
     float speedOffset = speed + _offset;
     _speed = speedOffset > 100.0 ? 100.0 : (speedOffset < 50.0 ? 50.0 : speedOffset);
-    _expander.setDutyCycle(_controller.PIN_EN, _speed);
+    _pwm = _expander.setDutyCycle(_controller.PIN_EN, _speed);
+}
+
+void Motor::setPWM(int pwm)
+{
+    _pwm = pwm;
+    _expander.setPWM(_controller.PIN_EN, _pwm);
+}
+
+int Motor::getPWM()
+{
+    return _pwm;
 }
 
 float Motor::getSpeed()

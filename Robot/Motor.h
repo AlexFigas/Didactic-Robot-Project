@@ -121,6 +121,9 @@ public:
      */
     void setSpeed(float speed);
     float getSpeed();
+
+    void setPWM(int pwm);
+    int getPWM();
     
     /*
      * Get the target interrupt.
@@ -157,6 +160,7 @@ private:
     float _radius;
     float _speed;
     float _offset;
+    int _pwm;
 
     // Private methods
     /*

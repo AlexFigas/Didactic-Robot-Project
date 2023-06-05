@@ -2,8 +2,12 @@
 #define MOVEMENT_H
 
 #include "Motor.h"
-#include <thread>
-#include <atomic>
+
+#define MOTOR_LEFT 0
+#define MOTOR_RIGHT 1
+// TODO
+#define _PERIOD 250
+#define _EXEC_TIME 6000
 
 class Movement
 {
@@ -30,15 +34,13 @@ public:
     float getWheelRadius();
     Motor *getMotors();
 
-    String resultLeft;
-    String resultRight;
+    String result;
 
 protected:
     int _numMotors;
     float _MAX_SPEED = 100.0; // Max speed (0% - 100%)
     int _DELAY_MOTORS = 50;   // Delay motors start up
-    int _PERIOD = 250;
-    int _EXEC_TIME = 5000;
+    
 
 private:
     void _waitForTargetInterrupt();
