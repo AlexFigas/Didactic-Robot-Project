@@ -12,6 +12,8 @@ static int const length = _EXEC_TIME / _PERIOD;  // Comprimento do array (20)
 static Data data[length];
 static int indexData;
 
+static bool toggle;
+
 Movement::Movement(Motor *motors, float track, float wheelRadius)
 {
     _motors = motors;
@@ -45,6 +47,7 @@ void Movement::begin()
 void Movement::line(float speed, float length, bool isFront)
 {
     reset();
+    toggle = false;
 
     indexData = 0;
     data[indexData].pwmLeft = _motors[MOTOR_LEFT].getPWM();
@@ -151,15 +154,27 @@ void Movement::_waitForTargetInterrupt()
             if (minDiff > 0) {
 
                 ratio = (float)(maxDiff) / (float)(minDiff);
+                float ratioAux = (ratio - 1.0) / 2.0;
+                float ratioAdd = 1.0 + ratioAux;
+                float ratioSub = 1.0 - ratioAux;
 
-                if (diffLeft > diffRight) 
+                if (diffLeft > diffRight) {
+                    _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratioAdd);
+                    _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratioSub);
+                }
+                else {
+                    _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratioSub);
+                    _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratioAdd);
+                }
+
+                /*if (diffLeft > diffRight) 
                 {
                     _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratio);
                 }
                 else 
                 {
                     _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratio);
-                }
+                }*/
             }
 
             ++indexData;
