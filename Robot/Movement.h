@@ -6,7 +6,7 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 // TODO
-#define _PERIOD 250
+#define _PERIOD 50
 #define _EXEC_TIME 6000
 
 class Movement
