@@ -10,13 +10,13 @@ class MovementTwoMotors : public Movement
 public:
     MovementTwoMotors(Motor *motors, float track, float wheelRadius);
 
-    void curve(int radius, int angle, int speed, bool isLeft = true) override;
-    void left(int radius, int angle, int speed) override;
-    void right(int radius, int angle, int speed) override;
+    void curve(float speed, int radius, int angle, bool isLeft = true) override;
+    void left(float speed, int radius, int angle) override;
+    void right(float speed, int radius, int angle) override;
 
 private:
 
-    void _calculateSpeedDistance(bool leftMotor, int radius, int angle, int speed, float* finalSpeed, float* finalDistance);
+    void _calculateSpeedDistance(float speed, bool leftMotor, int radius, int angle, float* finalSpeed, float* finalDistance);
 };
 
 #endif

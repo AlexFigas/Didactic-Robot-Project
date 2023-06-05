@@ -1,5 +1,6 @@
 #include "MovementTwoMotors.h"
 #include <BluetoothSerial.h>
+
 BluetoothSerial SerialBT;
 
 Expander expander = Expander();
@@ -31,34 +32,61 @@ Motor right = Motor(expander, rightController);
 float track = 13.0;
 float wheelRadius = 3.0;
 MovementTwoMotors movement = MovementTwoMotors(new Motor[2]{left, right}, track, wheelRadius);
-
 String command;
 
-/*
-void processCommand(String cmd) {
+#define NMOTORS 2
 
-    int speed = cmd.toInt();
-    
-    movement.line(speed, 100.0);
-    unsigned long finalTime = millis()+5000;
+class PID {
+    private:
+        float kp, kd, ki, umax; // Parameters
+        float eprev, eintegral; // Storage
 
-    while ( millis()<finalTime ) 
-      ;
+    public:
+    PID() : kp(1), kd(0.0025), ki(0), umax(60.0), eprev(0.0), eintegral(0.0){}
 
-    movement.slow();
-    movement.block();    
-        
-    char stringByte[80];
-    Motor * motors = movement.getMotors();
+    void setParams(float kpIn, float kdIn, float kiIn, float umaxIn) {
+        kp = kpIn; kd = kdIn; ki = kiIn; umax = umaxIn;
+    }
 
-    while ( millis()< (finalTime+250) ) 
-      ;
+    void evalu(int value, int target, float deltaT, int &pwr, int &dir) {
 
-    sprintf(stringByte, "%d;%d", motors[0].getCounter(), motors[1].getCounter() );
-    SerialBT.println( stringByte );
+        // Calcular o erro
+        int error = target - value;
 
-    movement.reset();
-}*/
+        // Derivada
+        float dedt = (error - eprev) / (deltaT);
+
+        // Integral 
+        eintegral = eintegral + error * deltaT;
+
+        // Sinal de controlo
+        float u = kp * error + kd * dedt + ki * eintegral;
+        pwr = (float) fabs(u);
+
+        // Limitar à velocidade máxima
+        if (pwr > umax) {
+            pwr = umax;
+        }
+
+        // Definir a direção
+        dir = 1;
+        if (u < 0) {
+            dir = -1;
+        }
+
+        eprev = error;
+    }
+};
+
+// Pins
+const int IN1[] = {4, 1};
+const int IN2[] = {5, 2};
+
+// Globals
+long prevT = 0;
+volatile int posi[] = {0, 0};
+
+PID pid[NMOTORS];
 
 void setup()
 {
@@ -66,19 +94,91 @@ void setup()
 
     // Serial and Bluetooth communication
     Serial.begin(9600);
-    SerialBT.begin("Robot"); 
+    SerialBT.begin("Robot");
+     
     movement.begin();
 }
 
+float target_f[] = {0.0, 0.0};
+long target[] = {300, 300};
+
 void loop()
 {
-    // Receiving bluetooth messages
-    if (SerialBT.available()) 
+    /*// Receiving bluetooth messages
+    if ( SerialBT.available() ) 
     {
-        command = SerialBT.readStringUntil('\n');
+        command = SerialBT.readStringUntil('\n'); 
         processMessage(command);
         command = "";
+    }*/
+
+    // Quando chegar ao objetivo (target ticks)
+    while(true) {
+
+        posi[0] = movement.getMotors()[0].getCounter();
+        posi[1] = movement.getMotors()[1].getCounter();
+
+        if (posi[0] > target[0] || posi[1] > target[1]) {
+            break;
+        }
+
+        // Tempo e deltaT
+        long currT = micros();
+        float deltaT = ((float) (currT - prevT)) / (1.0e6);
+        prevT = currT;
+
+        // Desativar interrupts temporariamente durante a leitura
+        int pos[2];
+        noInterrupts();
+        for(int k = 0; k < NMOTORS; k++) {
+            pos[k] = posi[k];
+        }
+        interrupts();
+
+        // Calcular o sinal de controlo para os motores e definir PWM
+        for(int k = 0; k < NMOTORS; k++) {
+
+          int pwm, dir;
+          pid[k].evalu(pos[k], target[k], deltaT, pwm, dir);
+          setMotor(k, dir, pwm, IN1[k], IN2[k]);
+        }
+
+        Serial.print(posi[0]);
+        Serial.print(" ");
+        Serial.print(posi[1]);
+        Serial.println("");
+
+        /*for(int k = 0; k < NMOTORS; k++){
+            Serial.print(target[k]);
+            Serial.print(" ");
+            Serial.print(pos[k]);
+            Serial.print(" ");
+        }
+        Serial.println();
+        */
+      }
+
+      // Quando terminar para
+      movement.stop(true);
+}
+
+void setMotor(int index, int dir, float pwmVal, int in1, int in2) {
+
+    movement.getMotors()[index].setSpeed(pwmVal);
+    
+    // Em frente
+    if(dir == 1) {
+        movement.getMotors()[index].setDirection(true);
     }
+    // Para trás
+    else if(dir == -1) {
+        movement.getMotors()[index].stop(false);
+        //movement.getMotors()[index].setDirection(false);
+    }
+    // Parar
+    else {
+        movement.getMotors()[index].stop(true);
+    }  
 }
 
 void processMessage(String msg) {
@@ -91,39 +191,26 @@ void processMessage(String msg) {
 
         // Commas separator
         int separator1 = msg.indexOf(',');
-        int separator2 = msg.indexOf(',', separator1 + 1);
+        int separator2 = msg.indexOf(',' , separator1 + 1);
         
         if (separator1 != -1 && separator2 != -1)
         {
+            int separator3 = msg.indexOf(',', separator2 + 1);
+
             // Speed and first parameter
             int speed = msg.substring(separator1 + 1, separator2).toInt(); 
-            float length = msg.substring(separator2 + 1).toFloat();
+            float length = msg.substring(separator2 + 1, separator3).toFloat();
+            float offset = msg.substring(separator3 + 1).toFloat();
             
             // Forward
             if (movementType == 'f')
             {
+                movement.getMotors()[1].setOffset(offset);
                 movement.line(speed, length, true);
 
-                /*
-                // Comentar as linhas 45, 48, 49 e 50 para realizar o seguinte teste de 5 segundos                 
-                //  DEBUG - Num de ticks //
-                unsigned long finalTime = millis()+5000;
-                while (millis() < finalTime);
-
-                movement.slow();
-                movement.block();    
-                    
-                char stringByte[80];
-                Motor* motors = movement.getMotors();
-
-                while (millis() < (finalTime + 150));
-
-                sprintf(stringByte, "%d;%d", motors[0].getCounter(), motors[1].getCounter() );
-                SerialBT.println( stringByte );
-
-                movement.reset();
-                //  DEBUG - Num de ticks //
-                */
+                SerialBT.println(movement.resultLeft);
+                SerialBT.println("-------------");
+                SerialBT.println(movement.resultRight);                
             } 
             // Backward
             else if (movementType == 'b')

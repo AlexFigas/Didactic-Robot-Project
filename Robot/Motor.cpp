@@ -4,13 +4,15 @@ Motor::Motor(Expander expander, MotorController controller)
 {
     _expander = expander;
     _controller = controller;
+    direction = true;
 
     _radius = _controller.wheelRadius;
     _perimeter = 21.5; //2 * _controller.wheelRadius * PI;
 
     _turnInterruptCount = _controller.interrupt.INT_COUNT * _INTERRUPT_FIX;
     _counter = 0;
-    _speed = 0;
+    _speed = 0.0;
+    _offset = 0.0;
 }
 
 void Motor::begin()
@@ -34,17 +36,19 @@ void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
     {      
+        direction = true;
         _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Clockwise
         _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
     }
     else
     {
+        direction = false;
         _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED); // Clockwise
         _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED); // Counterclockwise
     }
 }
 
-void Motor::front(int speed, float length)
+void Motor::front(float speed, float length)
 {
     if (_hasInterrupt && length > 0)
     {    
@@ -55,7 +59,7 @@ void Motor::front(int speed, float length)
     setSpeed(speed);
 }
 
-void Motor::back(int speed, float length)
+void Motor::back(float speed, float length)
 {
     if (_hasInterrupt && length > 0)
     {    
@@ -92,7 +96,15 @@ void Motor::stop(bool now)
 
 void Motor::_incrementCounter()
 {
-    ++_counter;
+    // TODO
+
+    if (direction == true) 
+    {
+        ++_counter;
+    }
+    else {
+        --_counter;
+    }
 }
 
 int Motor::getCounter() // TODO: depois apagar, só para testar
@@ -108,13 +120,24 @@ void Motor::resetCounter()
     _counter = 0;
 }
 
-void Motor::setSpeed(int speed)
+float Motor::getOffset()
+{
+    return _offset;
+}
+
+void Motor::setOffset(float offset)
+{
+    _offset = offset;
+}
+
+void Motor::setSpeed(float speed)
 { 
-    _speed = speed > 100 ? 100 : (speed < 50 ? 50 : speed);
+    float speedOffset = speed + _offset;
+    _speed = speedOffset > 100.0 ? 100.0 : (speedOffset < 50.0 ? 50.0 : speedOffset);
     _expander.setDutyCycle(_controller.PIN_EN, _speed);
 }
 
-int Motor::getSpeed()
+float Motor::getSpeed()
 {
     return _speed;
 }

@@ -75,7 +75,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void front(int speed, float length = 0);
+    void front(float speed, float length = 0);
 
     /*
      * Starts the motor in the backward direction.
@@ -85,7 +85,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void back(int speed, float cm = 0);
+    void back(float speed, float cm = 0);
 
     /*
      * Stops the motor.
@@ -110,14 +110,17 @@ public:
      */
     void resetCounter();
 
+    void setOffset(float offset);
+    float getOffset();
+
     /*
      * Sets the speed of the motor.
      *
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
      */
-    void setSpeed(int speed);
-    int getSpeed();
+    void setSpeed(float speed);
+    float getSpeed();
     
     /*
      * Get the target interrupt.
@@ -130,14 +133,15 @@ public:
     bool hasInterrupt();
 
     float getRadius();
-
     float getPerimeter();    
+
+    bool direction;
 
 private:
     // Private constants
-    static const int _FULL_SPEED = 100;  // The maximum speed value
-    static const int _STOP_SPEED = 0;    // The minimum speed value
-    static const int _INTERRUPT_FIX = 2; // Multiplicative constant for interrupt attach on change
+    static constexpr const float _FULL_SPEED = 100.0; // The maximum speed value
+    static constexpr const float _STOP_SPEED = 0.0;   // The minimum speed value
+    static const int _INTERRUPT_FIX = 2;    // Multiplicative constant for interrupt attach on change
 
     // Private variables
     Expander _expander;          // The Expander object for expanding the available GPIO pins
@@ -151,7 +155,8 @@ private:
 
     float _perimeter;            // Wheel perimeter (cm)
     float _radius;
-    int _speed;    
+    float _speed;
+    float _offset;
 
     // Private methods
     /*

@@ -5,7 +5,7 @@ MovementTwoMotors::MovementTwoMotors(Motor *motors, float track, float wheelRadi
     _numMotors = 2;
 }
 
-void MovementTwoMotors::curve(int speed, int radius, int angle, bool isLeft)
+void MovementTwoMotors::curve(float speed, int radius, int angle, bool isLeft)
 {
     if (isLeft == true)
     {
@@ -17,7 +17,7 @@ void MovementTwoMotors::curve(int speed, int radius, int angle, bool isLeft)
     }
 }
 
-void MovementTwoMotors::left(int radius, int angle, int speed)
+void MovementTwoMotors::left(float speed, int radius, int angle)
 {
     if (radius == 0)
     {
@@ -61,7 +61,7 @@ void MovementTwoMotors::left(int radius, int angle, int speed)
     }
 }
 
-void MovementTwoMotors::right(int radius, int angle, int speed)
+void MovementTwoMotors::right(float speed, int radius, int angle)
 {
     if (radius == 0)
     {
@@ -121,7 +121,7 @@ float rightDistance = (2 * M_PI * (radius + (_wheelbase / 2)) * angle) / 360;
 float rightSpeed = (rightDistance / time) / maxSpeed * speed;
 */
 
-void MovementTwoMotors::_calculateSpeedDistance(bool innerWheel, int radius, int angle, int speed, float* finalSpeed, float* finalDistance)
+void MovementTwoMotors::_calculateSpeedDistance(float speed, bool innerWheel, int radius, int angle, float* finalSpeed, float* finalDistance)
 {
 
 

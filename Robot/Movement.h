@@ -12,13 +12,13 @@ public:
 
     void begin();
 
-    void line(int speed, float length, bool isFront = true);
-    void front(int speed, float length);
-    void back(int speed, float length);
+    void line(float speed, float length, bool isFront = true);
+    void front(float speed, float length);
+    void back(float speed, float length);
 
-    virtual void curve(int radius, int angle, int speed, bool isLeft = true) = 0;
-    virtual void left(int radius, int angle, int speed) = 0;
-    virtual void right(int radius, int angle, int speed) = 0;
+    virtual void curve(float speed, int radius, int angle, bool isLeft = true) = 0;
+    virtual void left(float speed, int radius, int angle) = 0;
+    virtual void right(float speed, int radius, int angle) = 0;
 
     void stop(bool now);
     void slow();
@@ -30,14 +30,18 @@ public:
     float getWheelRadius();
     Motor *getMotors();
 
+    String resultLeft;
+    String resultRight;
+
 protected:
     int _numMotors;
-    int _MAX_SPEED = 100;   // Max speed (0% - 100%)
-    int _DELAY_MOTORS = 50; // Delay motors start up
+    float _MAX_SPEED = 100.0; // Max speed (0% - 100%)
+    int _DELAY_MOTORS = 50;   // Delay motors start up
     int _PERIOD = 250;
+    int _EXEC_TIME = 5000;
 
 private:
-    void _waitForTargetInterrupt(int speed);
+    void _waitForTargetInterrupt();
 
     float _track;       // Distance between wheels (cm)
     float _wheelRadius; // Wheel radius (cm)

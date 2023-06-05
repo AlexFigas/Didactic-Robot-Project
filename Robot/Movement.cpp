@@ -30,7 +30,7 @@ void Movement::begin()
     }
 }
 
-void Movement::line(int speed, float length, bool isFront)
+void Movement::line(float speed, float length, bool isFront)
 {
     // Forward or backward direction
     if (isFront)
@@ -42,7 +42,7 @@ void Movement::line(int speed, float length, bool isFront)
         back(speed, length);
     }
 
-    _waitForTargetInterrupt(speed);
+    _waitForTargetInterrupt();
     
     // Stops and resets the counters
     slow();
@@ -50,7 +50,7 @@ void Movement::line(int speed, float length, bool isFront)
     reset();
 }
 
-void Movement::front(int speed, float length)
+void Movement::front(float speed, float length)
 {
     // Forward movement of wheels
     for (int i = 0; i < _numMotors; i++)
@@ -60,7 +60,7 @@ void Movement::front(int speed, float length)
     }
 }
 
-void Movement::back(int speed, float length)
+void Movement::back(float speed, float length)
 {
     // Backward movement of wheels
     for (int i = 0; i < _numMotors; i++)
@@ -102,40 +102,52 @@ void Movement::reset()
     }  
 }
 
-void Movement::_waitForTargetInterrupt(int speed)
+struct data {
+    float dutycycle;
+    int numeroDeTicks;
+};
+
+void Movement::_waitForTargetInterrupt()
 {
+    int length = _EXEC_TIME / _PERIOD;  // Comprimento do array (20)
+    data leftMotor[length];
+    data rightMotor[length];
+    int a = 0;
+
     // Reset the counters
     reset();
 
     int leftMotorCounter = 0;
     int rightMotorCounter = 0;
     
-    unsigned long lastTime = 0;
-    unsigned long finalTime = millis()+5000;
-    
-    while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
-    //while ( millis()<finalTime ) 
+    unsigned long timeout = millis() + _PERIOD;
+    unsigned long finalTime = millis() + 5000;
+
+    //while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
+    while ( millis()<finalTime ) 
     {
         // Obtem o numero de interrupts atual de cada roda
         leftMotorCounter = _motors[0].getCounter();
-        rightMotorCounter = _motors[1].getCounter();     
+        rightMotorCounter = _motors[1].getCounter();
 
-        // Passado 50ms entra
+        // Passado 250ms entra
         unsigned long currentTime = millis();
-        if (currentTime - lastTime >= _PERIOD)
+        if (currentTime >= timeout)
         {
-            lastTime = currentTime;
+            timeout = currentTime + _PERIOD;
 
             if (leftMotorCounter > 0 && rightMotorCounter > 0)
             {
                 float tickRatio = (float)(leftMotorCounter) / (float)(rightMotorCounter);
+                float leftSpeed = _motors[0].getSpeed();
+                float rightSpeed = _motors[1].getSpeed();
 
-                int leftSpeed = _motors[0].getSpeed();
-                int rightSpeed = _motors[1].getSpeed();
+                leftMotor[a] = data{leftSpeed + _motors[0].getOffset(), leftMotorCounter};
+                rightMotor[a] = data{rightSpeed + _motors[1].getOffset(), rightMotorCounter};
+                a += 1;
 
-                // Deixar o esquerdo mais rapido
                // Deixar o esquerdo mais rapido / direito mais lento
-                if (tickRatio < 1.0)
+                /*if (tickRatio < 1.0)
                 {
                     if (leftSpeed + 5 > _MAX_SPEED) 
                     {
@@ -157,8 +169,21 @@ void Movement::_waitForTargetInterrupt(int speed)
                     {
                         _motors[1].setSpeed(rightSpeed + 5);
                     }   
-                }
+                }*/
             }
         }
+    }
+
+    resultLeft = "";
+    resultRight = "";
+
+    for (int i = 0; i < length; i++) {
+        resultLeft += String(leftMotor[i].numeroDeTicks);
+        resultLeft += String(";");
+    }
+
+    for (int i = 0; i < length; i++) {
+        resultRight += String(rightMotor[i].numeroDeTicks);
+        resultRight += String(";");
     }
 }
