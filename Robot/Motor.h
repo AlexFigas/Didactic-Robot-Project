@@ -30,7 +30,7 @@ struct MotorController
     byte PIN_IN1;        // Input 1 pin for the motor controller
     byte PIN_IN2;        // Input 2 pin for the motor controller
     Interrupt interrupt; // Interrupt configuration for the motor controller
-    int wheelRadius;     // Wheel radius in centimeters
+    float wheelRadius;     // Wheel radius in centimeters
 };
 
 /*
@@ -124,7 +124,7 @@ public:
 
     void setPWM(int pwm);
     int getPWM();
-    
+
     /*
      * Get the target interrupt.
      */
@@ -136,7 +136,7 @@ public:
     bool hasInterrupt();
 
     float getRadius();
-    float getPerimeter();    
+    float getPerimeter();
 
     bool direction;
 
@@ -144,19 +144,19 @@ private:
     // Private constants
     static constexpr const float _FULL_SPEED = 100.0; // The maximum speed value
     static constexpr const float _STOP_SPEED = 0.0;   // The minimum speed value
-    static const int _INTERRUPT_FIX = 2;    // Multiplicative constant for interrupt attach on change
+    static const int _INTERRUPT_FIX = 2;              // Multiplicative constant for interrupt attach on change
 
     // Private variables
     Expander _expander;          // The Expander object for expanding the available GPIO pins
     Interrupt _interrupt;        // The Interrupt object for configuring the interrupt
     MotorController _controller; // The MotorController object for configuring the motor controller
 
-    volatile int _counter;       // The interrupt counter for the motor
+    volatile int _counter; // The interrupt counter for the motor
     int _turnInterruptCount;
-    int _interruptTarget;        // Interrupt target for the motor
-    int _hasInterrupt;           // Flag for interrupt mode
+    int _interruptTarget; // Interrupt target for the motor
+    int _hasInterrupt;    // Flag for interrupt mode
 
-    float _perimeter;            // Wheel perimeter (cm)
+    float _perimeter; // Wheel perimeter (cm)
     float _radius;
     float _speed;
     float _offset;

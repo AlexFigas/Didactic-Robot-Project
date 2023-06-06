@@ -7,7 +7,7 @@ Motor::Motor(Expander expander, MotorController controller)
     direction = true;
 
     _radius = _controller.wheelRadius;
-    _perimeter = 21.5; //2 * _controller.wheelRadius * PI;
+    _perimeter = 21.5; // 2 * _controller.wheelRadius * PI;
 
     _turnInterruptCount = _controller.interrupt.INT_COUNT * _INTERRUPT_FIX;
     _counter = 0;
@@ -36,7 +36,7 @@ void Motor::begin()
 void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
-    {      
+    {
         direction = true;
         _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Clockwise
         _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
@@ -52,7 +52,7 @@ void Motor::setDirection(bool clockwise)
 void Motor::front(float speed, float length)
 {
     if (_hasInterrupt && length > 0)
-    {    
+    {
         resetCounter();
         _updateInterruptTarget(length);
     }
@@ -63,7 +63,7 @@ void Motor::front(float speed, float length)
 void Motor::back(float speed, float length)
 {
     if (_hasInterrupt && length > 0)
-    {    
+    {
         resetCounter();
         _updateInterruptTarget(length);
     }
@@ -99,11 +99,12 @@ void Motor::_incrementCounter()
 {
     // TODO
 
-    if (direction == true) 
+    if (direction == true)
     {
         ++_counter;
     }
-    else {
+    else
+    {
         --_counter;
     }
 }
@@ -132,7 +133,7 @@ void Motor::setOffset(float offset)
 }
 
 void Motor::setSpeed(float speed)
-{ 
+{
     float speedOffset = speed + _offset;
     _speed = speedOffset > 100.0 ? 100.0 : (speedOffset < 50.0 ? 50.0 : speedOffset);
     _pwm = _expander.setDutyCycle(_controller.PIN_EN, _speed);
@@ -176,7 +177,7 @@ float Motor::getRadius()
 
 void Motor::_updateInterruptTarget(float length)
 {
-    // Wheel rotations 
+    // Wheel rotations
     float rotations = length / _perimeter;
 
     // Number of interrupts required

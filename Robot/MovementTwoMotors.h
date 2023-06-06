@@ -15,8 +15,7 @@ public:
     void right(float speed, int radius, int angle) override;
 
 private:
-
-    void _calculateSpeedDistance(float speed, bool leftMotor, int radius, int angle, float* finalSpeed, float* finalDistance);
+    void _calculateSpeedDistance(float speed, bool leftMotor, int radius, int angle, float *finalSpeed, float *finalDistance);
 };
 
 #endif

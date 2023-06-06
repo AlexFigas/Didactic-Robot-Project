@@ -1,19 +1,5 @@
 #include "Movement.h"
 
-struct Data {
-    int pwmLeft;
-    int ticksLeft;
-    int pwmRight;
-    int ticksRight;
-    float ratio;
-};
-
-static int const length = _EXEC_TIME / _PERIOD;  // Comprimento do array (20)
-static Data data[length];
-static int indexData;
-
-static bool toggle;
-
 Movement::Movement(Motor *motors, float track, float wheelRadius)
 {
     _motors = motors;
@@ -33,7 +19,7 @@ float Movement::getTrack()
 
 float Movement::getWheelRadius()
 {
-  return _wheelRadius;
+    return _wheelRadius;
 }
 
 void Movement::begin()
@@ -61,16 +47,16 @@ void Movement::line(float speed, float length, bool isFront)
     {
         front(speed, length);
     }
-    else 
+    else
     {
         back(speed, length);
     }
 
     _waitForTargetInterrupt();
-    
+
     // Stops and resets the counters
     slow();
-    block();    
+    block();
     reset();
 }
 
@@ -114,7 +100,7 @@ void Movement::stop(bool now)
 {
     for (int i = 0; i < _numMotors; i++)
     {
-        _motors[_numMotors-i-1].stop(now);
+        _motors[_numMotors - i - 1].stop(now);
     }
 }
 
@@ -123,16 +109,16 @@ void Movement::reset()
     for (int i = 0; i < _numMotors; i++)
     {
         _motors[i].resetCounter();
-    }  
+    }
 }
 
 void Movement::_waitForTargetInterrupt()
-{    
+{
     unsigned long timeout = millis() + _PERIOD * 4;
     unsigned long finalTime = millis() + _EXEC_TIME;
 
-    //while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
-    while ( millis()<finalTime ) 
+    // while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
+    while (millis() < finalTime)
     {
         // Passado 250ms entra
         unsigned long currentTime = millis();
@@ -151,27 +137,30 @@ void Movement::_waitForTargetInterrupt()
             int minDiff = min(diffLeft, diffRight);
             float ratio = 0.0f;
 
-            if (minDiff > 0) {
+            if (minDiff > 0)
+            {
 
                 ratio = (float)(maxDiff) / (float)(minDiff);
                 float ratioAux = (ratio - 1.0) / 2.0;
                 float ratioAdd = 1.0 + ratioAux;
                 float ratioSub = 1.0 - ratioAux;
 
-                if (diffLeft > diffRight) {
+                if (diffLeft > diffRight)
+                {
                     _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratioAdd);
                     _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratioSub);
                 }
-                else {
+                else
+                {
                     _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratioSub);
                     _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratioAdd);
                 }
 
-                /*if (diffLeft > diffRight) 
+                /*if (diffLeft > diffRight)
                 {
                     _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratio);
                 }
-                else 
+                else
                 {
                     _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratio);
                 }*/
@@ -193,42 +182,42 @@ void Movement::_waitForTargetInterrupt()
                // Deixar o esquerdo mais rapido / direito mais lento
                 if (tickRatio < 1.0)
                 {
-                    if (leftSpeed + 5 > _MAX_SPEED) 
+                    if (leftSpeed + 5 > _MAX_SPEED)
                     {
                         _motors[1].setSpeed(rightSpeed - 1);
                     }
                     else
                     {
                         _motors[0].setSpeed(leftSpeed + 5);
-                    }                    
+                    }
                 }
                 // Deixar o esquerdo mais lento / direito mais rapido
                 else if (tickRatio > 1.0)
                 {
-                    if (rightSpeed + 5 > _MAX_SPEED) 
+                    if (rightSpeed + 5 > _MAX_SPEED)
                     {
                         _motors[0].setSpeed(leftSpeed - 1);
                     }
                     else
                     {
                         _motors[1].setSpeed(rightSpeed + 5);
-                    }   
+                    }
                 }*/
-            }
         }
+    }
 
     result = "";
 
     char auxBuffer[80];
 
-    sprintf( auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio\n" );
-    result += String( auxBuffer );
+    sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio\n");
+    result += String(auxBuffer);
 
-    //Serial.println(auxBuffer);
-    for (int i = 0; i < length; i++) {
-      sprintf( auxBuffer, "%d;%d;%d;%d;%d;%f\n", i, data[i].pwmLeft, data[i].pwmRight, data[i].ticksLeft, data[i].ticksRight, data[i].ratio );
-      //Serial.println(auxBuffer);
-      result += String( auxBuffer );
+    // Serial.println(auxBuffer);
+    for (int i = 0; i < length; i++)
+    {
+        sprintf(auxBuffer, "%d;%d;%d;%d;%d;%f\n", i, data[i].pwmLeft, data[i].pwmRight, data[i].ticksLeft, data[i].ticksRight, data[i].ratio);
+        // Serial.println(auxBuffer);
+        result += String(auxBuffer);
     }
-
 }
