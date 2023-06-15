@@ -1,5 +1,12 @@
 #include "MovementTwoMotors.h"
 
+#include <BluetoothSerial.h>
+extern BluetoothSerial SerialBT;
+
+int indexDataCurve;
+
+Data dataCurve[length];
+
 MovementTwoMotors::MovementTwoMotors(Motor *motors, float track, float wheelRadius) : Movement(motors, track, wheelRadius)
 {
     _numMotors = 2;
@@ -7,14 +14,30 @@ MovementTwoMotors::MovementTwoMotors(Motor *motors, float track, float wheelRadi
 
 void MovementTwoMotors::curve(float speed, int radius, int angle, bool isLeft)
 {
+    reset();
+
+    indexDataCurve = 0;
+    dataCurve[indexDataCurve].pwmLeft = _motors[MOTOR_LEFT].getPWM();
+    dataCurve[indexDataCurve].pwmRight = _motors[MOTOR_RIGHT].getPWM();
+    dataCurve[indexDataCurve].ticksLeft = _motors[MOTOR_LEFT].getCounter();
+    dataCurve[indexDataCurve].ticksRight = _motors[MOTOR_RIGHT].getCounter();
+    dataCurve[indexDataCurve].ratio = 0.0f;
+
     if (isLeft == true)
     {
-        left(radius, angle, speed);
+        left(speed, radius, angle);
     }
     else
     {
-        right(radius, angle, speed);
+        right(speed, radius, angle);
     }
+
+    _waitForTarget();
+
+    // Stops and resets the counters
+    slow();
+    block();
+    reset();
 }
 
 void MovementTwoMotors::left(float speed, int radius, int angle)
@@ -25,39 +48,15 @@ void MovementTwoMotors::left(float speed, int radius, int angle)
     }
     else
     {
-        if (angle > 0)
-        {
-            // Distance and time it takes the center of the robot to reach
-            float distance = (2 * PI * radius * angle) / 360;
-            float time = distance / speed;
+        float leftSpeed = (((float)(radius) - (getTrack() / 2.0)) / (float)(radius)) * speed;
+        float rightSpeed = (((float)(radius) + (getTrack() / 2.0)) / (float)(radius)) * speed;
 
-            // Speed ​​calculation for the inner motor
-            float leftDistance = (2 * PI * (radius - (getTrack() / 2)) * angle) / 360;
-            float leftSpeed = leftDistance / time;
+        // Activate motors
+        SerialBT.println(leftSpeed);
+        SerialBT.println(rightSpeed);
 
-            float rightDistance = (2 * PI * (radius + (getTrack() / 2)) * angle) / 360;
-            float rightSpeed = rightDistance / time;
-
-            // Force the minimum speed to be equal to _MAX_SPEED / 2
-            float offset = 0;
-            if (leftSpeed < (_MAX_SPEED / 2))
-            {
-                offset = (_MAX_SPEED / 2) - leftSpeed;
-            }
-            else if (rightSpeed < (_MAX_SPEED / 2))
-            {
-                offset = (_MAX_SPEED / 2) - rightSpeed;
-            }
-
-            // Activate motors
-            getMotors()[0].front(leftSpeed + offset, leftDistance);
-            delay(_DELAY_MOTORS);
-            getMotors()[1].front(rightSpeed + offset, rightDistance);
-        }
-        else
-        {
-            // TODO
-        }
+        getMotors()[0].front(leftSpeed, 1.0);
+        getMotors()[1].front(rightSpeed, 1.0);
     }
 }
 
@@ -69,38 +68,59 @@ void MovementTwoMotors::right(float speed, int radius, int angle)
     }
     else
     {
-        if (angle > 0)
+        float leftSpeed = (((float)(radius) + (getTrack() / 2.0)) / (float)(radius)) * speed;
+        float rightSpeed = (((float)(radius) - (getTrack() / 2.0)) / (float)(radius)) * speed;
+
+        // Activate motors
+        SerialBT.println(leftSpeed);
+        SerialBT.println(rightSpeed);
+
+        // Activate motors
+        getMotors()[0].front(leftSpeed, 1.0);
+        getMotors()[1].front(rightSpeed, 1.0);
+    }
+}
+
+void MovementTwoMotors::_waitForTarget()
+{
+    unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
+    unsigned long finalTime = millis() + _EXEC_TIME;
+
+    while (millis() < finalTime)
+    {
+        unsigned long currentTime = millis();
+        if (currentTime >= timeout)
         {
-            // Distance and time it takes the center of the robot to reach
-            float distance = (2 * PI * radius * angle) / 360;
-            float time = distance / speed;
+            // Obtem o numero de interrupts atual de cada roda
+            int counterLeft = _motors[MOTOR_LEFT].getCounter();
+            int counterRight = _motors[MOTOR_RIGHT].getCounter();
 
-            // Speed ​​calculation for the inner motor
-            float leftDistance = (2 * PI * (radius + (getTrack() / 2)) * angle) / 360;
-            float leftSpeed = leftDistance / time;
+            int diffLeft = counterLeft - dataCurve[indexDataCurve].ticksLeft;
+            int diffRight = counterRight - dataCurve[indexDataCurve].ticksRight;
 
-            float rightDistance = (2 * PI * (radius - (getTrack() / 2)) * angle) / 360;
-            float rightSpeed = rightDistance / time;
+            float ratio = 0.0f;
 
-            float offset = 0;
-            if (leftSpeed < (_MAX_SPEED / 2))
-            {
-                offset = (_MAX_SPEED / 2) - leftSpeed;
-            }
-            else if (rightSpeed < (_MAX_SPEED / 2))
-            {
-                offset = (_MAX_SPEED / 2) - rightSpeed;
-            }
+            timeout = currentTime + _PERIOD;
 
-            // Activate motors
-            getMotors()[0].front(leftSpeed + offset, leftDistance);
-            delay(_DELAY_MOTORS);
-            getMotors()[1].front(rightSpeed + offset, rightDistance);
+            ++indexDataCurve;
+            dataCurve[indexDataCurve].pwmLeft = _motors[MOTOR_LEFT].getPWM();
+            dataCurve[indexDataCurve].pwmRight = _motors[MOTOR_RIGHT].getPWM();
+            dataCurve[indexDataCurve].ticksLeft = counterLeft;
+            dataCurve[indexDataCurve].ticksRight = counterRight;
+            dataCurve[indexDataCurve].ratio = ratio;
         }
-        else
-        {
-            // TODO
-        }
+    }
+
+    char auxBuffer[80];
+
+    sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
+    SerialBT.print(auxBuffer);
+
+    // Serial.println(auxBuffer);
+    for (int i = 0; i < length; i++)
+    {
+        sprintf(auxBuffer, "%d;%d;%d;%d;%d;%f", i, dataCurve[i].pwmLeft, dataCurve[i].pwmRight, dataCurve[i].ticksLeft, dataCurve[i].ticksRight, dataCurve[i].ratio);
+        SerialBT.print(auxBuffer);
     }
 }
 

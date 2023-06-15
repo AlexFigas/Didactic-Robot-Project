@@ -16,6 +16,7 @@ public:
 
 private:
     void _calculateSpeedDistance(float speed, bool leftMotor, int radius, int angle, float *finalSpeed, float *finalDistance);
+    void _waitForTarget();
 };
 
 #endif

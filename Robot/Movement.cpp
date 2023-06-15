@@ -4,18 +4,11 @@
 
 extern BluetoothSerial SerialBT;
 
-struct Data
-{
-    int pwmLeft;
-    int ticksLeft;
-    int pwmRight;
-    int ticksRight;
-    float ratio;
-};
+float k = 1;
 
-static int const length = _EXEC_TIME / _PERIOD; // Comprimento do array (20)
-static Data data[length];
-static int indexData;
+int indexData;
+
+Data data[length];
 
 Movement::Movement(Motor *motors, float track, float wheelRadius)
 {
@@ -130,7 +123,7 @@ void Movement::reset()
 
 void Movement::_waitForTargetInterrupt()
 {
-    unsigned long timeout = millis() + _PERIOD * 4;
+    unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
 
     // while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
@@ -166,13 +159,13 @@ void Movement::_waitForTargetInterrupt()
 
                 if (diffLeft > diffRight)
                 {
-                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * ratioAdd;
-                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioSub;
+                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * (k * ratioAdd);
+                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * (k * ratioSub);
                 }
                 else
                 {
-                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * ratioSub;
-                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioAdd;
+                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * (k * ratioSub);
+                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * (k * ratioAdd);
                 }
 
                 // Truncate for _MIN_SPEED
@@ -205,15 +198,6 @@ void Movement::_waitForTargetInterrupt()
 
                 _motors[MOTOR_RIGHT].setPWM(rightSpeed);
                 _motors[MOTOR_LEFT].setPWM(leftSpeed);
-
-                /*if (diffLeft > diffRight)
-                  {
-                    _motors[MOTOR_RIGHT].setPWM(_motors[MOTOR_RIGHT].getPWM() * ratio);
-                  }
-                  else
-                  {
-                    _motors[MOTOR_LEFT].setPWM(_motors[MOTOR_LEFT].getPWM() * ratio);
-                  }*/
             }
 
             ++indexData;

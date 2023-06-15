@@ -90,7 +90,6 @@ void processMessage(String msg)
 
                 if (separator3 != -1)
                 {
-
                     // Radius and Angle
                     int radius = msg.substring(separator2 + 1, separator3).toInt();
                     int angle = msg.substring(separator3 + 1).toInt();

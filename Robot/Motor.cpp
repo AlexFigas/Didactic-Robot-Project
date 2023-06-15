@@ -93,12 +93,11 @@ void Motor::stop(bool now)
     {
         slow();
     }
+    setSpeed(0.0);
 }
 
 void Motor::_incrementCounter()
 {
-    // TODO
-
     if (direction == true)
     {
         ++_counter;
