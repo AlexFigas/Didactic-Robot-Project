@@ -34,11 +34,10 @@ public:
     float getWheelRadius();
     Motor *getMotors();
 
-    String result;
-
 protected:
     int _numMotors;
-    float _MAX_SPEED = 100.0; // Max speed (0% - 100%)
+    float _MAX_SPEED = 100.0; // Max motor speed (50% - 100%)
+    float _MIN_SPEED = 50.0;  // Min motor speed (50% - 100%)
     int _DELAY_MOTORS = 50;   // Delay motors start up
 
 private:
@@ -47,20 +46,5 @@ private:
     float _track;       // Distance between wheels (cm)
     float _wheelRadius; // Wheel radius (cm)
     Motor *_motors;
-
-    struct Data
-    {
-        int pwmLeft;
-        int ticksLeft;
-        int pwmRight;
-        int ticksRight;
-        float ratio;
-    };
-
-    static int const length = _EXEC_TIME / _PERIOD; // Comprimento do array (20)
-    static Data data[length];
-    static int indexData;
-
-    static bool toggle;
 };
 #endif

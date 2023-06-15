@@ -30,7 +30,7 @@ struct MotorController
     byte PIN_IN1;        // Input 1 pin for the motor controller
     byte PIN_IN2;        // Input 2 pin for the motor controller
     Interrupt interrupt; // Interrupt configuration for the motor controller
-    float wheelRadius;     // Wheel radius in centimeters
+    float wheelRadius;   // Wheel radius in centimeters
 };
 
 /*

@@ -77,7 +77,6 @@ void processMessage(String msg)
             if (movementType == 'f')
             {
                 movement.line(speed, length, true);
-                SerialBT.println(movement.result);
             }
             // Backward
             else if (movementType == 'b')
