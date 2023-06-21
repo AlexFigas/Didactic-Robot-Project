@@ -13,7 +13,6 @@ MotorController leftController = MotorController{
         .PIN_DO = 33,
         .INT_COUNT = 20},
     .wheelRadius = 3.3};
-Motor left = Motor(expander, leftController);
 
 MotorController rightController = MotorController{
     .PIN_EN = 0,
@@ -23,11 +22,14 @@ MotorController rightController = MotorController{
         .PIN_DO = 32,
         .INT_COUNT = 20},
     .wheelRadius = 3.3};
-Motor right = Motor(expander, rightController);
 
 float track = 13.0;
 float wheelRadius = 3.0;
-MovementTwoMotors movement = MovementTwoMotors(new Motor[2]{left, right}, track, wheelRadius);
+MovementTwoMotors movement = MovementTwoMotors(
+    new Motor[2]{Motor(expander, leftController), Motor(expander, rightController)},
+    track,
+    wheelRadius);
+
 String command;
 
 void setup()
