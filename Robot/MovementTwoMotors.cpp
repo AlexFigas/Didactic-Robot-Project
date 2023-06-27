@@ -16,13 +16,6 @@ void MovementTwoMotors::curve(float speed, int radius, int angle, bool isLeft)
 {
     reset();
 
-    indexDataCurve = 0;
-    dataCurve[indexDataCurve].pwmLeft = _motors[MOTOR_LEFT].getPWM();
-    dataCurve[indexDataCurve].pwmRight = _motors[MOTOR_RIGHT].getPWM();
-    dataCurve[indexDataCurve].ticksLeft = _motors[MOTOR_LEFT].getCounter();
-    dataCurve[indexDataCurve].ticksRight = _motors[MOTOR_RIGHT].getCounter();
-    dataCurve[indexDataCurve].ratio = 0.0f;
-
     if (isLeft == true)
     {
         left(speed, radius, angle);
@@ -31,6 +24,13 @@ void MovementTwoMotors::curve(float speed, int radius, int angle, bool isLeft)
     {
         right(speed, radius, angle);
     }
+    
+    indexDataCurve = 0;
+    dataCurve[indexDataCurve].pwmLeft = _motors[MOTOR_LEFT].getPWM();
+    dataCurve[indexDataCurve].pwmRight = _motors[MOTOR_RIGHT].getPWM();
+    dataCurve[indexDataCurve].ticksLeft = _motors[MOTOR_LEFT].getCounter();
+    dataCurve[indexDataCurve].ticksRight = _motors[MOTOR_RIGHT].getCounter();
+    dataCurve[indexDataCurve].ratio = 0.0f;
 
     _waitForTarget();
 
@@ -38,6 +38,18 @@ void MovementTwoMotors::curve(float speed, int radius, int angle, bool isLeft)
     slow();
     block();
     reset();
+
+    char auxBuffer[80];
+
+    sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
+    SerialBT.print(auxBuffer);
+
+    // Serial.println(auxBuffer);
+    for (int i = 0; i < length; i++)
+    {
+        sprintf(auxBuffer, "%d;%d;%d;%d;%d;%f", i, dataCurve[i].pwmLeft, dataCurve[i].pwmRight, dataCurve[i].ticksLeft, dataCurve[i].ticksRight, dataCurve[i].ratio);
+        SerialBT.print(auxBuffer);
+    }
 }
 
 void MovementTwoMotors::left(float speed, int radius, int angle)
@@ -86,6 +98,7 @@ void MovementTwoMotors::_waitForTarget()
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
 
+    //while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() !! rightMotorCounter >= _motors[1].getTargetInterrupt()))
     while (millis() < finalTime)
     {
         unsigned long currentTime = millis();
@@ -109,18 +122,6 @@ void MovementTwoMotors::_waitForTarget()
             dataCurve[indexDataCurve].ticksRight = counterRight;
             dataCurve[indexDataCurve].ratio = ratio;
         }
-    }
-
-    char auxBuffer[80];
-
-    sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
-    SerialBT.print(auxBuffer);
-
-    // Serial.println(auxBuffer);
-    for (int i = 0; i < length; i++)
-    {
-        sprintf(auxBuffer, "%d;%d;%d;%d;%d;%f", i, dataCurve[i].pwmLeft, dataCurve[i].pwmRight, dataCurve[i].ticksLeft, dataCurve[i].ticksRight, dataCurve[i].ratio);
-        SerialBT.print(auxBuffer);
     }
 }
 

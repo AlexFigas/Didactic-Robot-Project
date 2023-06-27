@@ -93,7 +93,7 @@ public:
      * @param now - A boolean indicating whether to stop the motor immediately (true) or coast to a stop (false).
      *              Defaults to false.
      */
-    void stop(bool now = false);
+    void stop();
 
     void slow();
     void block();
@@ -109,9 +109,6 @@ public:
      * Resets the interrupt count to zero.
      */
     void resetCounter();
-
-    void setOffset(float offset);
-    float getOffset();
 
     /*
      * Sets the speed of the motor.
@@ -159,7 +156,6 @@ private:
     float _perimeter; // Wheel perimeter (cm)
     float _radius;
     float _speed;
-    float _offset;
     int _pwm;
 
     // Private methods

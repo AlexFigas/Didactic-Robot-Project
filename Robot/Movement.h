@@ -7,7 +7,7 @@
 #define MOTOR_RIGHT 1
 // TODO
 #define _PERIOD 50
-#define _EXEC_TIME 6000
+#define _EXEC_TIME 3000
 #define _SAMPLES_TO_SKIP 4
 
 int const length = (_EXEC_TIME / _PERIOD) - (_SAMPLES_TO_SKIP - 1); // Comprimento do array (20)
@@ -38,7 +38,7 @@ public:
     virtual void left(float speed, int radius, int angle) = 0;
     virtual void right(float speed, int radius, int angle) = 0;
 
-    void stop(bool now);
+    void stop();
     void slow();
     void block();
 
@@ -52,12 +52,13 @@ protected:
     int _numMotors;
     int _MAX_SPEED = 4095; // Max motor speed (50% - 100%)
     int _MIN_SPEED = 2048;  // Min motor speed (50% - 100%)
-    int _DELAY_MOTORS = 50;   // Delay motors start up
+    int _DELAY_MOTORS = 50;  // Delay motors start up
     Motor *_motors;
 
 private:
     void _waitForTargetInterrupt();
 
+    float _initial_speed;
     float _track;       // Distance between wheels (cm)
     float _wheelRadius; // Wheel radius (cm)
 };

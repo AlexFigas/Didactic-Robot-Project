@@ -4,14 +4,13 @@
 
 extern BluetoothSerial SerialBT;
 
-float k = 1;
-
 int indexData;
 
 Data data[length];
 
 Movement::Movement(Motor *motors, float track, float wheelRadius)
 {
+    _initial_speed = 0.0;
     _motors = motors;
     _track = track;
     _wheelRadius = wheelRadius;
@@ -44,13 +43,6 @@ void Movement::line(float speed, float length, bool isFront)
 {
     reset();
 
-    indexData = 0;
-    data[indexData].pwmLeft = _motors[MOTOR_LEFT].getPWM();
-    data[indexData].pwmRight = _motors[MOTOR_RIGHT].getPWM();
-    data[indexData].ticksLeft = _motors[MOTOR_LEFT].getCounter();
-    data[indexData].ticksRight = _motors[MOTOR_RIGHT].getCounter();
-    data[indexData].ratio = 0.0f;
-
     // Forward or backward direction
     if (isFront)
     {
@@ -61,12 +53,29 @@ void Movement::line(float speed, float length, bool isFront)
         back(speed, length);
     }
 
+    indexData = 0;
+    data[indexData].pwmLeft = _motors[MOTOR_LEFT].getPWM();
+    data[indexData].pwmRight = _motors[MOTOR_RIGHT].getPWM();
+    data[indexData].ticksLeft = _motors[MOTOR_LEFT].getCounter();
+    data[indexData].ticksRight = _motors[MOTOR_RIGHT].getCounter();
+    data[indexData].ratio = 0.0f;
+
     _waitForTargetInterrupt();
 
     // Stops and resets the counters
     slow();
     block();
     reset();
+
+    char auxBuffer[80];
+    //sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
+    //SerialBT.println(auxBuffer);
+
+    for (int i = 0; i < length; i++)
+    {
+        sprintf(auxBuffer, "%d;%d;%d;%d;%f", data[i].pwmLeft, data[i].pwmRight, data[i].ticksLeft, data[i].ticksRight, data[i].ratio);
+        SerialBT.println(auxBuffer);
+    }
 }
 
 void Movement::front(float speed, float length)
@@ -105,11 +114,11 @@ void Movement::block()
     }
 }
 
-void Movement::stop(bool now)
+void Movement::stop()
 {
     for (int i = 0; i < _numMotors; i++)
     {
-        _motors[_numMotors - i - 1].stop(now);
+        _motors[i].stop();
     }
 }
 
@@ -126,19 +135,24 @@ void Movement::_waitForTargetInterrupt()
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
 
-    // while (!(leftMotorCounter >= _motors[0].getTargetInterrupt() && rightMotorCounter >= _motors[1].getTargetInterrupt()))
-    while (millis() < finalTime)
+    int currentLeftCounter = _motors[MOTOR_LEFT].getCounter();
+    int currentRightCounter = _motors[MOTOR_RIGHT].getCounter();
+
+    int leftTarget = _motors[MOTOR_LEFT].getTargetInterrupt();
+    int rightTarget = _motors[MOTOR_RIGHT].getTargetInterrupt();
+
+    while ( (currentLeftCounter < leftTarget || currentRightCounter < rightTarget ) )
     {
-        // Passado 250ms entra
+        // Passado PERIOD entra
         unsigned long currentTime = millis();
         if (currentTime >= timeout)
         {
             // Obtem o numero de interrupts atual de cada roda
-            int counterLeft = _motors[MOTOR_LEFT].getCounter();
-            int counterRight = _motors[MOTOR_RIGHT].getCounter();
+            currentLeftCounter = _motors[MOTOR_LEFT].getCounter();
+            currentRightCounter = _motors[MOTOR_RIGHT].getCounter();
 
-            int diffLeft = counterLeft - data[indexData].ticksLeft;
-            int diffRight = counterRight - data[indexData].ticksRight;
+            int diffLeft = currentLeftCounter - data[indexData].ticksLeft;
+            int diffRight = currentRightCounter - data[indexData].ticksRight;
 
             timeout = currentTime + _PERIOD;
 
@@ -151,7 +165,6 @@ void Movement::_waitForTargetInterrupt()
 
             if (minDiff > 0)
             {
-
                 ratio = (float)(maxDiff) / (float)(minDiff);
                 float ratioAux = (ratio - 1.0) / 2.0;
                 float ratioAdd = 1.0 + ratioAux;
@@ -159,96 +172,31 @@ void Movement::_waitForTargetInterrupt()
 
                 if (diffLeft > diffRight)
                 {
-                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * (k * ratioAdd);
-                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * (k * ratioSub);
+                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * ratioAdd;
+                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioSub;
                 }
                 else
                 {
-                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * (k * ratioSub);
-                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * (k * ratioAdd);
+                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * ratioSub;
+                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioAdd;
                 }
 
-                // Truncate for _MIN_SPEED
-                if (rightSpeed < _MIN_SPEED)
-                {
-                    motorDif = _MIN_SPEED - rightSpeed;
-                    rightSpeed = _MIN_SPEED;
-                    leftSpeed = leftSpeed + motorDif;
-                }
-                if (leftSpeed < _MIN_SPEED)
-                {
-                    motorDif = _MIN_SPEED - leftSpeed;
-                    leftSpeed = _MIN_SPEED;
-                    rightSpeed = rightSpeed + motorDif;
-                }
+                float motorDif_right = rightSpeed < _MIN_SPEED ? _MIN_SPEED - rightSpeed : (rightSpeed > _MAX_SPEED ? _MAX_SPEED-rightSpeed : 0);
+                float motorDif_left = leftSpeed < _MIN_SPEED ? _MIN_SPEED - leftSpeed : (leftSpeed > _MAX_SPEED ? _MAX_SPEED-leftSpeed : 0);
 
-                // Truncate for _MAX_SPEED
-                if (rightSpeed > _MAX_SPEED)
-                {
-                    motorDif = rightSpeed - _MAX_SPEED;
-                    rightSpeed = _MAX_SPEED;
-                    leftSpeed = leftSpeed - motorDif;
-                }
-                if (leftSpeed > _MAX_SPEED)
-                {
-                    motorDif = leftSpeed - _MAX_SPEED;
-                    leftSpeed = _MAX_SPEED;
-                    rightSpeed = rightSpeed - motorDif;
-                }
-
+                rightSpeed = rightSpeed+motorDif_left < _MIN_SPEED ? _MIN_SPEED : (rightSpeed+motorDif_left > _MAX_SPEED ? _MAX_SPEED : rightSpeed+motorDif_left);
+                leftSpeed = leftSpeed+motorDif_right < _MIN_SPEED ? _MIN_SPEED : (leftSpeed+motorDif_right > _MAX_SPEED ? _MAX_SPEED : leftSpeed+motorDif_right);
+                
                 _motors[MOTOR_RIGHT].setPWM(rightSpeed);
                 _motors[MOTOR_LEFT].setPWM(leftSpeed);
+
+                ++indexData;
+                data[indexData].pwmLeft = _motors[MOTOR_LEFT].getPWM();
+                data[indexData].pwmRight = _motors[MOTOR_RIGHT].getPWM();
+                data[indexData].ticksLeft = currentLeftCounter;
+                data[indexData].ticksRight = currentRightCounter;
+                data[indexData].ratio = ratio;
             }
-
-            ++indexData;
-            data[indexData].pwmLeft = _motors[MOTOR_LEFT].getPWM();
-            data[indexData].pwmRight = _motors[MOTOR_RIGHT].getPWM();
-            data[indexData].ticksLeft = counterLeft;
-            data[indexData].ticksRight = counterRight;
-            data[indexData].ratio = ratio;
-
-            /*if (leftMotorCounter > 0 && rightMotorCounter > 0)
-              {
-                float tickRatio = (float)(leftMotorCounter) / (float)(rightMotorCounter);
-                float leftSpeed = _motors[0].getSpeed();
-                float rightSpeed = _motors[1].getSpeed();
-
-               // Deixar o esquerdo mais rapido / direito mais lento
-                if (tickRatio < 1.0)
-                {
-                    if (leftSpeed + 5 > _MAX_SPEED)
-                    {
-                        _motors[1].setSpeed(rightSpeed - 1);
-                    }
-                    else
-                    {
-                        _motors[0].setSpeed(leftSpeed + 5);
-                    }
-                }
-                // Deixar o esquerdo mais lento / direito mais rapido
-                else if (tickRatio > 1.0)
-                {
-                    if (rightSpeed + 5 > _MAX_SPEED)
-                    {
-                        _motors[0].setSpeed(leftSpeed - 1);
-                    }
-                    else
-                    {
-                        _motors[1].setSpeed(rightSpeed + 5);
-                    }
-                }*/
         }
-    }
-
-    char auxBuffer[80];
-
-    sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
-    SerialBT.print(auxBuffer);
-
-    // Serial.println(auxBuffer);
-    for (int i = 0; i < length; i++)
-    {
-        sprintf(auxBuffer, "%d;%d;%d;%d;%d;%f", i, data[i].pwmLeft, data[i].pwmRight, data[i].ticksLeft, data[i].ticksRight, data[i].ratio);
-        SerialBT.print(auxBuffer);
     }
 }
