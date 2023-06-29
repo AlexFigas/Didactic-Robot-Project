@@ -15,13 +15,11 @@ int const length = (_EXEC_TIME / _PERIOD) - (_SAMPLES_TO_SKIP - 1); // Comprimen
 struct Data
 {
     int pwmLeft;
-    int ticksLeft;
     int pwmRight;
+    int ticksLeft;
     int ticksRight;
     float ratio;
 };
-
-
 
 class Movement
 {
@@ -45,20 +43,18 @@ public:
     void reset();
 
     float getTrack();
-    float getWheelRadius();
     Motor *getMotors();
 
 protected:
+    Motor *_motors;
     int _numMotors;
+    int _MIN_PWM = 2048; 
+    int _MAX_PWM = 4095; 
     float _MIN_SPEED = 50.0;
     float _MAX_SPEED = 100.0;
-    int _MIN_PWM = 2048;  // Min motor speed (50% - 100%)
-    int _MAX_PWM = 4095; // Max motor speed (50% - 100%)
-    int _DELAY_MOTORS = 50;  // Delay motors start up
-    Motor *_motors;
-
+    
 private:
-    void _waitForTargetInterrupt();
+    virtual void _directionCalibration();
     float _track;       // Distance between wheels (cm)
 };
 #endif

@@ -4,15 +4,15 @@ Motor::Motor(Expander expander, MotorController controller)
 {
     _expander = expander;
     _controller = controller;
-    direction = true;
 
     _radius = _controller.wheelRadius;
     _perimeter = 21.5; // 2 * _controller.wheelRadius * PI;
 
     _turnInterruptCount = _controller.interrupt.INT_COUNT * _INTERRUPT_FIX;
     _counter = 0;
-    _speed = 0.0;
+
     _pwm = 0;
+    _speed = 0.0;
 }
 
 void Motor::begin()
@@ -36,13 +36,11 @@ void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
     {
-        direction = true;
         _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Clockwise
         _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
     }
     else
     {
-        direction = false;
         _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED); // Clockwise
         _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED); // Counterclockwise
     }

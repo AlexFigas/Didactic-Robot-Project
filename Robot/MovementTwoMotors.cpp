@@ -34,7 +34,7 @@ void MovementTwoMotors::curve(float speed, float radius, float angle, bool isLef
     dataCurve[indexDataCurve].ticksRight = _motors[MOTOR_RIGHT].getCounter();
     dataCurve[indexDataCurve].ratio = 0.0f;
 
-    _waitForTarget();
+    _directionCalibration();
 
     // Stops and resets the counters
     slow();
@@ -61,27 +61,20 @@ void MovementTwoMotors::left(float speed, float radius, float angle)
     }
     else
     {
+        // Desired speed for each motor
         float track2 = getTrack() / 2.0;
         float leftSpeed = ((radius - track2) / radius) * speed;
         float rightSpeed = ((radius + track2) / radius) * speed;
 
-        SerialBT.println(leftSpeed);
-        SerialBT.println(rightSpeed);
-
-        float leftDiff = leftSpeed < _MIN_SPEED ? _MIN_SPEED - leftSpeed : (leftSpeed > _MAX_SPEED ? _MAX_SPEED-leftSpeed : 0);
-        float rightDiff = rightSpeed < _MIN_SPEED ? _MIN_SPEED - rightSpeed : (rightSpeed > _MAX_SPEED ? _MAX_SPEED-rightSpeed : 0);
-
+        // Adjust values ​​to within limits
+        float leftDiff = leftSpeed < _MIN_SPEED ? _MIN_SPEED - leftSpeed : (leftSpeed > _MAX_SPEED ? _MAX_SPEED - leftSpeed : 0);
+        float rightDiff = rightSpeed < _MIN_SPEED ? _MIN_SPEED - rightSpeed : (rightSpeed > _MAX_SPEED ? _MAX_SPEED - rightSpeed : 0);
         leftSpeed = leftSpeed + rightDiff + leftDiff < _MIN_SPEED ? _MIN_SPEED : (leftSpeed + rightDiff + leftDiff > _MAX_SPEED ? _MAX_SPEED : leftSpeed + leftDiff + rightDiff);
         rightSpeed = rightSpeed + rightDiff + leftDiff < _MIN_SPEED ? _MIN_SPEED : (rightSpeed + rightDiff + leftDiff > _MAX_SPEED ? _MAX_SPEED : rightSpeed + rightDiff + leftDiff);
 
+        // Distance to travel for each wheel
         float leftDistance = (2.0 * PI * (radius - track2) * angle) / 360.0;
         float rightDistance = (2.0 * PI * (radius + track2) * angle) / 360.0;
-
-        // Activate motors
-        SerialBT.println(leftSpeed);
-        SerialBT.println(rightSpeed);
-        SerialBT.println(leftDistance);
-        SerialBT.println(rightDistance);
 
         getMotors()[MOTOR_LEFT].front(leftSpeed, leftDistance);
         getMotors()[MOTOR_RIGHT].front(rightSpeed, rightDistance);
@@ -96,20 +89,27 @@ void MovementTwoMotors::right(float speed, float radius, float angle)
     }
     else
     {
-        float leftSpeed = (((float)(radius) + (getTrack() / 2.0)) / (float)(radius)) * speed;
-        float rightSpeed = (((float)(radius) - (getTrack() / 2.0)) / (float)(radius)) * speed;
+        // Desired speed for each motor
+        float track2 = getTrack() / 2.0;
+        float leftSpeed = ((radius + track2) / radius) * speed;
+        float rightSpeed = ((radius - track2) / radius) * speed;
 
-        // Activate motors
-        SerialBT.println(leftSpeed);
-        SerialBT.println(rightSpeed);
+        // Adjust values ​​to within limits
+        float leftDiff = leftSpeed < _MIN_SPEED ? _MIN_SPEED - leftSpeed : (leftSpeed > _MAX_SPEED ? _MAX_SPEED - leftSpeed : 0);
+        float rightDiff = rightSpeed < _MIN_SPEED ? _MIN_SPEED - rightSpeed : (rightSpeed > _MAX_SPEED ? _MAX_SPEED - rightSpeed : 0);
+        leftSpeed = leftSpeed + rightDiff + leftDiff < _MIN_SPEED ? _MIN_SPEED : (leftSpeed + rightDiff + leftDiff > _MAX_SPEED ? _MAX_SPEED : leftSpeed + leftDiff + rightDiff);
+        rightSpeed = rightSpeed + rightDiff + leftDiff < _MIN_SPEED ? _MIN_SPEED : (rightSpeed + rightDiff + leftDiff > _MAX_SPEED ? _MAX_SPEED : rightSpeed + rightDiff + leftDiff);
 
-        // Activate motors
-        getMotors()[MOTOR_LEFT].front(leftSpeed, 1.0);
-        getMotors()[MOTOR_RIGHT].front(rightSpeed, 1.0);
+        // Distance to travel for each wheel
+        float leftDistance = (2.0 * PI * (radius - track2) * angle) / 360.0;
+        float rightDistance = (2.0 * PI * (radius + track2) * angle) / 360.0;
+
+        getMotors()[MOTOR_LEFT].front(leftSpeed, leftDistance);
+        getMotors()[MOTOR_RIGHT].front(rightSpeed, rightDistance);
     }
 }
 
-void MovementTwoMotors::_waitForTarget()
+void MovementTwoMotors::_directionCalibration()
 {
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;

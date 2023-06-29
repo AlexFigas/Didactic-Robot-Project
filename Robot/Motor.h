@@ -135,8 +135,6 @@ public:
     float getRadius();
     float getPerimeter();
 
-    bool direction;
-
 private:
     // Private constants
     static constexpr const float _FULL_SPEED = 100.0; // The maximum speed value

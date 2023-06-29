@@ -1,5 +1,4 @@
 #include "Movement.h"
-
 #include <BluetoothSerial.h>
 
 extern BluetoothSerial SerialBT;
@@ -55,7 +54,7 @@ void Movement::line(float speed, float length, bool isFront)
     data[indexData].ticksRight = _motors[MOTOR_RIGHT].getCounter();
     data[indexData].ratio = 0.0f;
 
-    _waitForTargetInterrupt();
+    _directionCalibration();
 
     // Stops and resets the counters
     slow();
@@ -125,7 +124,7 @@ void Movement::reset()
     }
 }
 
-void Movement::_waitForTargetInterrupt()
+void Movement::_directionCalibration()
 {
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
