@@ -26,7 +26,7 @@ struct Data
 class Movement
 {
 public:
-    Movement(Motor *motors, float track, float wheelRadius);
+    Movement(Motor *motors, float track);
 
     void begin();
 
@@ -34,9 +34,9 @@ public:
     void front(float speed, float length);
     void back(float speed, float length);
 
-    virtual void curve(float speed, int radius, int angle, bool isLeft = true) = 0;
-    virtual void left(float speed, int radius, int angle) = 0;
-    virtual void right(float speed, int radius, int angle) = 0;
+    virtual void curve(float speed, float radius, float angle, bool isLeft = true) = 0;
+    virtual void left(float speed, float radius, float angle) = 0;
+    virtual void right(float speed, float radius, float angle) = 0;
 
     void stop();
     void slow();
@@ -50,16 +50,15 @@ public:
 
 protected:
     int _numMotors;
-    int _MAX_SPEED = 4095; // Max motor speed (50% - 100%)
-    int _MIN_SPEED = 2048;  // Min motor speed (50% - 100%)
+    float _MIN_SPEED = 50.0;
+    float _MAX_SPEED = 100.0;
+    int _MIN_PWM = 2048;  // Min motor speed (50% - 100%)
+    int _MAX_PWM = 4095; // Max motor speed (50% - 100%)
     int _DELAY_MOTORS = 50;  // Delay motors start up
     Motor *_motors;
 
 private:
     void _waitForTargetInterrupt();
-
-    float _initial_speed;
     float _track;       // Distance between wheels (cm)
-    float _wheelRadius; // Wheel radius (cm)
 };
 #endif

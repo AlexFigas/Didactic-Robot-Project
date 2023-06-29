@@ -8,12 +8,10 @@ int indexData;
 
 Data data[length];
 
-Movement::Movement(Motor *motors, float track, float wheelRadius)
+Movement::Movement(Motor *motors, float track)
 {
-    _initial_speed = 0.0;
     _motors = motors;
     _track = track;
-    _wheelRadius = wheelRadius;
 }
 
 Motor *Movement::getMotors()
@@ -26,11 +24,6 @@ float Movement::getTrack()
     return _track;
 }
 
-float Movement::getWheelRadius()
-{
-    return _wheelRadius;
-}
-
 void Movement::begin()
 {
     for (int i = 0; i < _numMotors; i++)
@@ -41,16 +34,18 @@ void Movement::begin()
 
 void Movement::line(float speed, float length, bool isFront)
 {
+    float targetSpeed = speed < _MIN_SPEED ? _MIN_SPEED : (speed > _MAX_SPEED ? _MAX_SPEED : speed);
+
     reset();
 
     // Forward or backward direction
     if (isFront)
     {
-        front(speed, length);
+        front(targetSpeed, length);
     }
     else
     {
-        back(speed, length);
+        back(targetSpeed, length);
     }
 
     indexData = 0;
@@ -181,11 +176,11 @@ void Movement::_waitForTargetInterrupt()
                     leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioAdd;
                 }
 
-                float motorDif_right = rightSpeed < _MIN_SPEED ? _MIN_SPEED - rightSpeed : (rightSpeed > _MAX_SPEED ? _MAX_SPEED-rightSpeed : 0);
-                float motorDif_left = leftSpeed < _MIN_SPEED ? _MIN_SPEED - leftSpeed : (leftSpeed > _MAX_SPEED ? _MAX_SPEED-leftSpeed : 0);
+                float motorDif_right = rightSpeed < _MIN_PWM ? _MIN_PWM - rightSpeed : (rightSpeed > _MAX_PWM ? _MAX_PWM-rightSpeed : 0);
+                float motorDif_left = leftSpeed < _MIN_PWM ? _MIN_PWM - leftSpeed : (leftSpeed > _MAX_PWM ? _MAX_PWM-leftSpeed : 0);
 
-                rightSpeed = rightSpeed+motorDif_left < _MIN_SPEED ? _MIN_SPEED : (rightSpeed+motorDif_left > _MAX_SPEED ? _MAX_SPEED : rightSpeed+motorDif_left);
-                leftSpeed = leftSpeed+motorDif_right < _MIN_SPEED ? _MIN_SPEED : (leftSpeed+motorDif_right > _MAX_SPEED ? _MAX_SPEED : leftSpeed+motorDif_right);
+                rightSpeed = rightSpeed+motorDif_left < _MIN_PWM ? _MIN_PWM : (rightSpeed+motorDif_left > _MAX_PWM ? _MAX_PWM : rightSpeed+motorDif_left);
+                leftSpeed = leftSpeed+motorDif_right < _MIN_PWM ? _MIN_PWM : (leftSpeed+motorDif_right > _MAX_PWM ? _MAX_PWM : leftSpeed+motorDif_right);
                 
                 _motors[MOTOR_RIGHT].setPWM(rightSpeed);
                 _motors[MOTOR_LEFT].setPWM(leftSpeed);

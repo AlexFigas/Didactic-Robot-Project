@@ -27,8 +27,7 @@ float track = 13.0;
 float wheelRadius = 3.0;
 MovementTwoMotors movement = MovementTwoMotors(
     new Motor[2]{Motor(expander, leftController), Motor(expander, rightController)},
-    track,
-    wheelRadius);
+    track);
 
 String command;
 
