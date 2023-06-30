@@ -1,7 +1,7 @@
-/*
- * Expander.h - Library for controlling a PWM expander.
+/**
+ * @file Expander.h - Library for controlling a PWM expander.
  *
- * Written by Alexandre Figueiredo and Daniela Gonçalves
+ * @author Alexandre Figueiredo and Daniela Gonçalves
  */
 
 #ifndef EXPANDER_H
@@ -11,8 +11,8 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <Wire.h>
 
-/*
- * Class representing a PWM expander.
+/**
+ * @brief Class representing a PWM expander.
  */
 class Expander
 {
@@ -23,28 +23,35 @@ public:
 
     // Public methods
 
-    /*
-     * Constructor for the Expander class.
+    /**
+     * @brief Constructor for the Expander class.
      *
      * @param address - An optional byte indicating the I2C address of the expander.
      *                  Defaults to 0x40.
      */
     Expander(byte address = 0x40);
 
-    /*
-     * Initializes the expander.
+    /**
+     * @brief Initializes the expander.
      * This method should be called once at the beginning of the program.
      */
     void begin();
 
-    /*
-     * Sets the duty cycle of a PWM channel on the expander.
+    /**
+     * @brief Sets the duty cycle of a PWM channel on the expander.
      *
      * @param channel - A byte indicating the channel number to set the duty cycle for.
      * @param duty_cycle - A byte indicating the duty cycle to set.
      *                     Must be between 0 and 100.
      */
     int setDutyCycle(byte channel, float duty_cycle);
+
+    /**
+     * @brief Sets the PWM value of a PWM channel on the expander.
+     *
+     * @param channel - A byte indicating the channel number to set the PWM value for.
+     * @param pwm - An int indicating the PWM value to set.
+     */
     void setPWM(byte channel, int pwm);
 
 private:

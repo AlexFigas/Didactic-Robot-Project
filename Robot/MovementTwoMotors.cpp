@@ -1,11 +1,6 @@
 #include "MovementTwoMotors.h"
 
-#include <BluetoothSerial.h>
 extern BluetoothSerial SerialBT;
-
-int indexDataCurve;
-
-Data dataCurve[length];
 
 MovementTwoMotors::MovementTwoMotors(Motor *motors, float track) : Movement(motors, track)
 {
@@ -26,7 +21,7 @@ void MovementTwoMotors::curve(float speed, float radius, float angle, bool isLef
     {
         right(targetSpeed, radius, angle);
     }
-    
+
     indexDataCurve = 0;
     dataCurve[indexDataCurve].pwmLeft = _motors[MOTOR_LEFT].getPWM();
     dataCurve[indexDataCurve].pwmRight = _motors[MOTOR_RIGHT].getPWM();
@@ -34,7 +29,7 @@ void MovementTwoMotors::curve(float speed, float radius, float angle, bool isLef
     dataCurve[indexDataCurve].ticksRight = _motors[MOTOR_RIGHT].getCounter();
     dataCurve[indexDataCurve].ratio = 0.0f;
 
-    _directionCurveCalibration();
+    directionCurveCalibration();
 
     // Stops and resets the counters
     slow();
@@ -109,7 +104,7 @@ void MovementTwoMotors::right(float speed, float radius, float angle)
     }
 }
 
-void MovementTwoMotors::_directionCurveCalibration()
+void MovementTwoMotors::directionCurveCalibration()
 {
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
@@ -120,7 +115,7 @@ void MovementTwoMotors::_directionCurveCalibration()
     int leftTarget = _motors[MOTOR_LEFT].getTargetInterrupt();
     int rightTarget = _motors[MOTOR_RIGHT].getTargetInterrupt();
 
-    float k = (float) (leftTarget) / (float) (rightTarget); 
+    float k = (float)(leftTarget) / (float)(rightTarget);
 
     char auxBuffer[80];
     sprintf(auxBuffer, "leftTarget: %d ; rightTarget: %d ; flag: %d", leftTarget, rightTarget, (int)(currentLeftCounter < leftTarget || currentRightCounter < rightTarget));
@@ -171,7 +166,7 @@ void MovementTwoMotors::_directionCurveCalibration()
 
                 rightSpeed = rightSpeed+motorDif_left < _MIN_PWM ? _MIN_PWM : (rightSpeed+motorDif_left > _MAX_PWM ? _MAX_PWM : rightSpeed+motorDif_left);
                 leftSpeed = leftSpeed+motorDif_right < _MIN_PWM ? _MIN_PWM : (leftSpeed+motorDif_right > _MAX_PWM ? _MAX_PWM : leftSpeed+motorDif_right);
-                
+
                 _motors[MOTOR_RIGHT].setPWM(rightSpeed);
                 _motors[MOTOR_LEFT].setPWM(leftSpeed);
 
@@ -182,6 +177,77 @@ void MovementTwoMotors::_directionCurveCalibration()
                 dataCurve[indexDataCurve].ticksRight = currentRightCounter;
                 dataCurve[indexDataCurve].ratio = ratio;
             }*/
+        }
+    }
+}
+
+void MovementTwoMotors::directionLineCalibration()
+{
+    unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
+    unsigned long finalTime = millis() + _EXEC_TIME;
+
+    int currentLeftCounter = _motors[MOTOR_LEFT].getCounter();
+    int currentRightCounter = _motors[MOTOR_RIGHT].getCounter();
+
+    int leftTarget = _motors[MOTOR_LEFT].getTargetInterrupt();
+    int rightTarget = _motors[MOTOR_RIGHT].getTargetInterrupt();
+
+    while ((currentLeftCounter < leftTarget || currentRightCounter < rightTarget))
+    {
+        // Passado PERIOD entra
+        unsigned long currentTime = millis();
+        if (currentTime >= timeout)
+        {
+            // Obtem o numero de interrupts atual de cada roda
+            currentLeftCounter = _motors[MOTOR_LEFT].getCounter();
+            currentRightCounter = _motors[MOTOR_RIGHT].getCounter();
+
+            int diffLeft = currentLeftCounter - dataLine[indexDataLine].ticksLeft;
+            int diffRight = currentRightCounter - dataLine[indexDataLine].ticksRight;
+
+            timeout = currentTime + _PERIOD;
+
+            int maxDiff = max(diffLeft, diffRight);
+            int minDiff = min(diffLeft, diffRight);
+            float ratio = 0.0f;
+
+            float motorDif;
+            float rightSpeed, leftSpeed;
+
+            if (minDiff > 0)
+            {
+                ratio = (float)(maxDiff) / (float)(minDiff);
+                float ratioAux = (ratio - 1.0) / 2.0;
+                float ratioAdd = 1.0 + ratioAux;
+                float ratioSub = 1.0 - ratioAux;
+
+                if (diffLeft > diffRight)
+                {
+                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * ratioAdd;
+                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioSub;
+                }
+                else
+                {
+                    rightSpeed = _motors[MOTOR_RIGHT].getPWM() * ratioSub;
+                    leftSpeed = _motors[MOTOR_LEFT].getPWM() * ratioAdd;
+                }
+
+                float motorDif_right = rightSpeed < _MIN_PWM ? _MIN_PWM - rightSpeed : (rightSpeed > _MAX_PWM ? _MAX_PWM - rightSpeed : 0);
+                float motorDif_left = leftSpeed < _MIN_PWM ? _MIN_PWM - leftSpeed : (leftSpeed > _MAX_PWM ? _MAX_PWM - leftSpeed : 0);
+
+                rightSpeed = rightSpeed + motorDif_left < _MIN_PWM ? _MIN_PWM : (rightSpeed + motorDif_left > _MAX_PWM ? _MAX_PWM : rightSpeed + motorDif_left);
+                leftSpeed = leftSpeed + motorDif_right < _MIN_PWM ? _MIN_PWM : (leftSpeed + motorDif_right > _MAX_PWM ? _MAX_PWM : leftSpeed + motorDif_right);
+
+                _motors[MOTOR_RIGHT].setPWM(rightSpeed);
+                _motors[MOTOR_LEFT].setPWM(leftSpeed);
+
+                ++indexDataLine;
+                dataLine[indexDataLine].pwmLeft = _motors[MOTOR_LEFT].getPWM();
+                dataLine[indexDataLine].pwmRight = _motors[MOTOR_RIGHT].getPWM();
+                dataLine[indexDataLine].ticksLeft = currentLeftCounter;
+                dataLine[indexDataLine].ticksRight = currentRightCounter;
+                dataLine[indexDataLine].ratio = ratio;
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
-/*
- * Motor.h - Library for controlling a DC motor using an H-bridge driver.
+/**
+ * @file Motor.h - Library for controlling a DC motor using an H-bridge driver.
  *
- * Written by Alexandre Figueiredo and Daniela Gonçalves
+ * @author Alexandre Figueiredo and Daniela Gonçalves
  */
 
 #ifndef MOTOR_H
@@ -12,8 +12,8 @@
 #include <Math.h>
 #include <FunctionalInterrupt.h>
 
-/*
- * Struct representing an interrupt configuration.
+/**
+ * @brief Struct representing an interrupt configuration.
  */
 struct Interrupt
 {
@@ -21,8 +21,8 @@ struct Interrupt
     byte INT_COUNT; // Interrupt counter value
 };
 
-/*
- * Struct representing a motor controller configuration.
+/**
+ * @brief Struct representing a motor controller configuration.
  */
 struct MotorController
 {
@@ -33,8 +33,8 @@ struct MotorController
     float wheelRadius;   // Wheel radius in centimeters
 };
 
-/*
- * Class representing a DC motor.
+/**
+ * @brief Class representing a DC motor.
  */
 class Motor
 {
@@ -45,30 +45,30 @@ public:
 
     // Public methods
 
-    /*
-     * Constructor for the Motor class.
+    /**
+     * @brief Constructor for the Motor class.
      *
      * @param expander - An optional Expander object for expanding the available GPIO pins.
      * @param controller - An optional MotorController object for configuring the motor controller.
      */
     Motor(Expander expander, MotorController controller);
 
-    /*
-     * Initializes the motor and motor controller pins.
+    /**
+     * @brief Initializes the motor and motor controller pins.
      * This method should be called once at the beginning of the program.
      */
     void begin();
 
-    /*
-     * Sets the direction of the motor.
+    /**
+     * @brief Sets the direction of the motor.
      *
      * @param clockwise - A boolean indicating the direction of the motor.
      *                    true for clockwise, false for counterclockwise.
      */
     void setDirection(bool clockwise);
 
-    /*
-     * Starts the motor in the forward direction.
+    /**
+     * @brief Starts the motor in the forward direction.
      *
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
@@ -77,8 +77,8 @@ public:
      */
     void front(float speed, float length = 0);
 
-    /*
-     * Starts the motor in the backward direction.
+    /**
+     * @brief Starts the motor in the backward direction.
      *
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
@@ -87,52 +87,84 @@ public:
      */
     void back(float speed, float cm = 0);
 
-    /*
-     * Stops the motor.
+    /**
+     * @brief Stops the motor.
      *
      * @param now - A boolean indicating whether to stop the motor immediately (true) or coast to a stop (false).
      *              Defaults to false.
      */
     void stop();
 
+    /**
+     * @brief Slows the motor down.
+     */
     void slow();
+
+    /**
+     * @brief Blocks the motor.
+     */
     void block();
 
-    /*
-     * Gets the current interrupt count.
+    /**
+     * @brief Gets the current interrupt count.
      *
      * @return An integer representing the interrupt count.
      */
     int getCounter();
 
-    /*
-     * Resets the interrupt count to zero.
+    /**
+     * @brief Resets the interrupt count to zero.
      */
     void resetCounter();
 
-    /*
-     * Sets the speed of the motor.
+    /**
+     * @brief Sets the speed of the motor.
      *
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
      */
     void setSpeed(float speed);
+
+    /**
+     * @brief Gets the speed of the motor.
+     *
+     * @return A float representing the speed of the motor.
+     */
     float getSpeed();
 
+    /**
+     * @brief Sets the PWM of the motor.
+     *
+     * @param pwm - An integer indicating the PWM of the motor.
+     *              Must be between 0 and 100.
+     */
     void setPWM(int pwm);
+
+    /**
+     * @brief Gets the PWM of the motor.
+     *
+     * @return An integer representing the PWM of the motor.
+     */
     int getPWM();
 
-    /*
-     * Get the target interrupt.
+    /**
+     * @brief Get the target interrupt.
      */
     int getTargetInterrupt();
 
     /**
-     * Check if the motor has a interrupt.
+     * @brief Check if the motor has a interrupt.
      */
     bool hasInterrupt();
 
+    /**
+     * @brief Get the radius of the wheel.
+     */
     float getRadius();
+
+    /**
+     * @brief Get the perimeter of the wheel.
+     */
     float getPerimeter();
 
 private:
@@ -157,14 +189,14 @@ private:
     int _pwm;
 
     // Private methods
-    /*
-     * Interrupt service routine for counting interrupts.
+    /**
+     * @brief Interrupt service routine for counting interrupts.
      * This method should not be called directly.
      */
     IRAM_ATTR void _incrementCounter();
 
-    /*
-     * Convert the lenght (cm) to number of interrupts and updates the interrupt target.
+    /**
+     * @brief Convert the lenght (cm) to number of interrupts and updates the interrupt target.
      */
     void _updateInterruptTarget(float length);
 };
