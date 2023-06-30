@@ -15,7 +15,7 @@ public:
     void right(float speed, float radius, float angle) override;
 
 private:
-    void _directionCalibration() override;
+    void _directionCurveCalibration();
 };
 
 #endif

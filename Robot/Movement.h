@@ -54,7 +54,7 @@ protected:
     float _MAX_SPEED = 100.0;
     
 private:
-    virtual void _directionCalibration();
+    void _directionLineCalibration();
     float _track;       // Distance between wheels (cm)
 };
 #endif

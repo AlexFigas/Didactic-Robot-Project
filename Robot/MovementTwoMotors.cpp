@@ -34,7 +34,7 @@ void MovementTwoMotors::curve(float speed, float radius, float angle, bool isLef
     dataCurve[indexDataCurve].ticksRight = _motors[MOTOR_RIGHT].getCounter();
     dataCurve[indexDataCurve].ratio = 0.0f;
 
-    _directionCalibration();
+    _directionCurveCalibration();
 
     // Stops and resets the counters
     slow();
@@ -109,7 +109,7 @@ void MovementTwoMotors::right(float speed, float radius, float angle)
     }
 }
 
-void MovementTwoMotors::_directionCalibration()
+void MovementTwoMotors::_directionCurveCalibration()
 {
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
