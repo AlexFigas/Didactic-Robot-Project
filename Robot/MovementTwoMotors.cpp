@@ -1,6 +1,6 @@
 #include "MovementTwoMotors.h"
 
-extern BluetoothSerial SerialBT;
+//extern BluetoothSerial SerialBT;
 
 MovementTwoMotors::MovementTwoMotors(Motor *motors, float track) : Movement(motors, track)
 {
@@ -117,9 +117,9 @@ void MovementTwoMotors::directionCurveCalibration()
 
     float k = (float)(leftTarget) / (float)(rightTarget);
 
-    char auxBuffer[80];
-    sprintf(auxBuffer, "leftTarget: %d ; rightTarget: %d ; flag: %d", leftTarget, rightTarget, (int)(currentLeftCounter < leftTarget || currentRightCounter < rightTarget));
-    SerialBT.println(auxBuffer);
+    //char auxBuffer[80];
+    //sprintf(auxBuffer, "leftTarget: %d ; rightTarget: %d ; flag: %d", leftTarget, rightTarget, (int)(currentLeftCounter < leftTarget || currentRightCounter < rightTarget));
+    //SerialBT.println(auxBuffer);
 
     while ((currentLeftCounter < leftTarget || currentRightCounter < rightTarget))
     {

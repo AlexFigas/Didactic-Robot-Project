@@ -1,6 +1,6 @@
 #include "Movement.h"
 
-extern BluetoothSerial SerialBT;
+extern BluetoothSerial _serialBT;
 
 int indexDataLine;
 Data dataLine[length];
@@ -61,15 +61,15 @@ void Movement::line(float speed, float length, bool isFront)
     block();
     reset();
 
-    char auxBuffer[80];
+    //char auxBuffer[80];
     // sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
     // SerialBT.println(auxBuffer);
 
-    for (int i = 0; i < length; i++)
-    {
-        sprintf(auxBuffer, "%d;%d;%d;%d;%f", dataLine[i].pwmLeft, dataLine[i].pwmRight, dataLine[i].ticksLeft, dataLine[i].ticksRight, dataLine[i].ratio);
-        SerialBT.println(auxBuffer);
-    }
+    //for (int i = 0; i < length; i++)
+    //{
+    //    sprintf(auxBuffer, "%d;%d;%d;%d;%f", dataLine[i].pwmLeft, dataLine[i].pwmRight, dataLine[i].ticksLeft, dataLine[i].ticksRight, dataLine[i].ratio);
+    //    SerialBT.println(auxBuffer);
+    //}
 }
 
 void Movement::front(float speed, float length)
