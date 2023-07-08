@@ -9,7 +9,7 @@
   <h3 align="center">Development of a didactic robot</h3>
 
   <p align="center">
-  The project aims at the development of a didactic robot capable of performing movements in 2D space. The ultimate goal is to create a prototype that had a set of interconnected sensors and actuators. 
+  The project aims at the development of a didactic robot capable of performing movements in 2D space. The ultimate goal is to create a prototype that has a set of interconnected sensors and actuators. 
     <br />
     <br />
     <a href="https://github.com/AlexFigas/Projeto-Robot-Didatico/issues">Report Issue</a>
@@ -31,6 +31,7 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
+    <li><a href="#report">Report</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
@@ -57,8 +58,6 @@ To get started with this project you must have some sort of Arduino development 
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
 1. Install some kind of Arduino development environment, in our case we use Arduino IDE, VS Code and Arduino extension:
 * https://www.arduino.cc/en/software
 * https://code.visualstudio.com/
@@ -68,12 +67,11 @@ _Below is an example of how you can instruct your audience on installing and set
 * https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/ 
 * https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library
 
-3. Clone the repo
+3. Clone the repo and add it to the Arduino IDE libraries.
     ```sh
     git clone https://github.com/AlexFigas/Projeto-Robot-Didatico.git
     ```
 4. Enjoy!
-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -83,6 +81,8 @@ _Below is an example of how you can instruct your audience on installing and set
 Herein lies the final report of the project in Portuguese.
 
 * [Download the report here](docs/report.pdf)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
 ## License
