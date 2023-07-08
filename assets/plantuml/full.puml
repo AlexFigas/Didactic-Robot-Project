@@ -1,0 +1,139 @@
+@startuml Diagrama de classes
+!theme mono
+
+skinparam linetype ortho
+
+/' Objects '/
+class Expander {
+	+Expander(byte address)
+	-_board : Adafruit_PWMServoDriver
+	-_initialized : bool
+	-_address : byte
+	-{static} _MAX_DUTY_CYCLE : const static byte
+	-{static} _MIN_DUTY_CYCLE : const static byte
+	-{static} _MAX_PWM_ON : const static int
+	-{static} _MIN_PWM_ON : const static int
+	-{static} _PWM_OFF_POINT : const static int
+	+setDutyCycle(byte channel, float duty_cycle) : int
+	+begin() : void
+	+setPWM(byte channel, int pwm) : void
+}
+
+class Motor {
+	+Motor(Expander expander, MotorController controller)
+	-_expander : Expander
+	-_incrementCounter() : IRAM_ATTR void
+	-_interrupt : Interrupt
+	-_controller : MotorController
+	+hasInterrupt() : bool
+	-_perimeter : float
+	-_radius : float
+	-_speed : float
+	+getPerimeter() : float
+	+getRadius() : float
+	+getSpeed() : float
+	-_hasInterrupt : int
+	-_interruptTarget : int
+	-_pwm : int
+	-_turnInterruptCount : int
+	+getCounter() : int
+	+getPWM() : int
+	+getTargetInterrupt() : int
+	-{static} _INTERRUPT_FIX : static const int
+	-{static} _FULL_SPEED : static constexpr const float
+	-{static} _STOP_SPEED : static constexpr const float
+	-_updateInterruptTarget(float length) : void
+	+back(float speed, float cm) : void
+	+begin() : void
+	+block() : void
+	+front(float speed, float length) : void
+	+resetCounter() : void
+	+setDirection(bool clockwise) : void
+	+setPWM(int pwm) : void
+	+setSpeed(float speed) : void
+	+slow() : void
+	+stop() : void
+	-_counter : volatile int
+}
+
+abstract class Movement {
+	+Movement(Motor* motors, float track)
+	#_motors : Motor*
+	+getMotors() : Motor*
+	#_MAX_SPEED : float
+	#_MIN_SPEED : float
+	-_track : float
+	+getTrack() : float
+	#_MAX_PWM : int
+	#_MIN_PWM : int
+	#_numMotors : int
+	+back(float speed, float length) : void
+	+begin() : void
+	+block() : void
+	+{abstract} curve(float speed, float radius, float angle, bool isLeft) : void
+	+{abstract} directionCurveCalibration() : void
+	+{abstract} directionLineCalibration() : void
+	+front(float speed, float length) : void
+	+{abstract} left(float speed, float radius, float angle) : void
+	+line(float speed, float length, bool isFront) : void
+	+reset() : void
+	+{abstract} right(float speed, float radius, float angle) : void
+	+slow() : void
+	+stop() : void
+}
+
+class MovementTwoMotors {
+    +MovementTwoMotors(Motor *motors, float track)
+    +curve(float speed, float radius, float angle, bool isLeft = true) : void
+    +left(float speed, float radius, float angle) : void
+    +right(float speed, float radius, float angle) : void
+    +directionCurveCalibration() : void
+    +directionLineCalibration() : void
+}
+
+class Robot {
+    +Robot(String name, Movement* movement)
+    +begin() : void
+    +loop() : void
+    -_movement : Movement*
+    -_name : String
+    -_command : String
+    -_processCommand(String command) : void
+}
+
+struct Data {
+	+ratio : float
+	+pwmLeft : int
+	+pwmRight : int
+	+ticksLeft : int
+	+ticksRight : int
+}
+
+struct Interrupt {
+	+INT_COUNT : byte
+	+PIN_DO : byte
+}
+
+struct MotorController {
+	+interrupt : Interrupt
+	+PIN_EN : byte
+	+PIN_IN1 : byte
+	+PIN_IN2 : byte
+	+wheelRadius : float
+}
+
+/' Inheritance relationships '/
+Movement <|-- MovementTwoMotors
+
+/' Aggregation relationships '/
+.Motor *-- .Expander
+.Motor *-- .Interrupt
+.Motor *-- .MotorController
+.MotorController *-- .Interrupt
+.Movement o-left- .Motor
+.Robot o-- .Movement
+
+/' Nested objects '/
+.Movement *-right- .Data
+
+@enduml
