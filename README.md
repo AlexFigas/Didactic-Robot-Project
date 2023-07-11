@@ -80,7 +80,7 @@ To get started with this project you must have some sort of Arduino development 
 
 Herein lies the final report of the project in Portuguese.
 
-* [Download the report here](docs/report.pdf)
+* [Download the report here](docs/college/_RELATORIO.pdf)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
