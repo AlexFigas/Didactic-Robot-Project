@@ -90,7 +90,7 @@ void Motor::_incrementCounter()
     ++_counter;
 }
 
-int Motor::getCounter() // TODO: depois apagar, só para testar
+int Motor::getCounter()
 {
     if (_hasInterrupt)
         return _counter;

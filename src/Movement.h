@@ -12,7 +12,6 @@
 
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
-// TODO
 #define _PERIOD 50
 #define _EXEC_TIME 3000
 #define _SAMPLES_TO_SKIP 4

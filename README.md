@@ -43,7 +43,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-The project presented in this report describes the development of an educational robot capable of performing movements in 2D space. The developed prototype consists of a set of interconnected sensors and actuators. Furthermore, the robot allows communication with a computer/mobile device through Bluetooth communication.
+The project presented in this report describes the development of an educational robot capable of performing movements in 2D space. The developed prototype consists of a set of sensors and actuators. Furthermore, the robot allows communication with a computer/mobile device through Bluetooth protocol.
 
 This project aims to create an educational environment for exploring concepts related to robotics, such as motion control, wireless communication, and Java programming. The developed prototype is a functional educational robot that can be used as a learning tool.
 

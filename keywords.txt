@@ -1,0 +1,84 @@
+# Syntax Coloring Map For Didactic Robot
+
+# Datatypes (KEYWORD1)
+Expander	KEYWORD1
+Interrupt	KEYWORD1
+MotorController	KEYWORD1
+Motor	KEYWORD1
+Robot	KEYWORD1
+MovementTwoMotors	KEYWORD1
+Data	KEYWORD1
+Movement	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+begin	KEYWORD2
+setDutyCycle	KEYWORD2
+setPWM	KEYWORD2
+begin	KEYWORD2
+setDirection	KEYWORD2
+front	KEYWORD2
+back	KEYWORD2
+stop	KEYWORD2
+slow	KEYWORD2
+block	KEYWORD2
+getCounter	KEYWORD2
+resetCounter	KEYWORD2
+setSpeed	KEYWORD2
+getSpeed	KEYWORD2
+setPWM	KEYWORD2
+getPWM	KEYWORD2
+getTargetInterrupt	KEYWORD2
+hasInterrupt	KEYWORD2
+getRadius	KEYWORD2
+getPerimeter	KEYWORD2
+_incrementCounter	KEYWORD2
+_updateInterruptTarget	KEYWORD2
+begin	KEYWORD2
+loop	KEYWORD2
+_processCommand	KEYWORD2
+curve	KEYWORD2
+left	KEYWORD2
+right	KEYWORD2
+directionCurveCalibration	KEYWORD2
+directionLineCalibration	KEYWORD2
+begin	KEYWORD2
+line	KEYWORD2
+front	KEYWORD2
+back	KEYWORD2
+curve	KEYWORD2
+left	KEYWORD2
+right	KEYWORD2
+directionLineCalibration	KEYWORD2
+directionCurveCalibration	KEYWORD2
+stop	KEYWORD2
+slow	KEYWORD2
+block	KEYWORD2
+reset	KEYWORD2
+getTrack	KEYWORD2
+getMotors	KEYWORD2
+
+# Instances (KEYWORD2)
+_board	KEYWORD2
+_expander	KEYWORD2
+_interrupt	KEYWORD2
+_controller	KEYWORD2
+_movement	KEYWORD2
+dataLine	KEYWORD2
+dataCurve	KEYWORD2
+_motors	KEYWORD2
+
+# Constants (LITERAL1)
+_MAX_DUTY_CYCLE	LITERAL1
+_MIN_DUTY_CYCLE	LITERAL1
+_MAX_PWM_ON	LITERAL1
+_MIN_PWM_ON	LITERAL1
+_PWM_OFF_POINT	LITERAL1
+_FULL_SPEED	LITERAL1
+_STOP_SPEED	LITERAL1
+_INTERRUPT_FIX	LITERAL1
+MOTOR_LEFT	LITERAL1
+MOTOR_RIGHT	LITERAL1
+_PERIOD	LITERAL1
+_EXEC_TIME	LITERAL1
+_SAMPLES_TO_SKIP	LITERAL1
+length	LITERAL1

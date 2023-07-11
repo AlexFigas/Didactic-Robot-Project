@@ -123,11 +123,9 @@ void MovementTwoMotors::directionCurveCalibration()
 
     while ((currentLeftCounter < leftTarget || currentRightCounter < rightTarget))
     {
-        // Passado PERIOD entra
         unsigned long currentTime = millis();
         if (currentTime >= timeout)
         {
-            // Obtem o numero de interrupts atual de cada roda
             currentLeftCounter = _motors[MOTOR_LEFT].getCounter();
             currentRightCounter = _motors[MOTOR_RIGHT].getCounter();
 
@@ -194,11 +192,9 @@ void MovementTwoMotors::directionLineCalibration()
 
     while ((currentLeftCounter < leftTarget || currentRightCounter < rightTarget))
     {
-        // Passado PERIOD entra
         unsigned long currentTime = millis();
         if (currentTime >= timeout)
         {
-            // Obtem o numero de interrupts atual de cada roda
             currentLeftCounter = _motors[MOTOR_LEFT].getCounter();
             currentRightCounter = _motors[MOTOR_RIGHT].getCounter();
 
