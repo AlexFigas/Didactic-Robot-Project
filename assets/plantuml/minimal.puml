@@ -13,10 +13,7 @@ class Motor {
 abstract class Movement {
 }
 
-class MovementTwoMotors {
-}
-
-class Robot {
+class MovementTwoMotors extends Movement {
 }
 
 struct Data {
@@ -25,21 +22,19 @@ struct Data {
 struct Interrupt {
 }
 
+
 struct MotorController {
 }
 
-/' Inheritance relationships '/
-Movement <|-- MovementTwoMotors
+class Robot {
+}
 
 /' Aggregation relationships '/
-.Motor *-up- .Expander
+.Motor *-left- .Expander
 .Motor *-- .Interrupt
 .Motor *-- .MotorController
 .MotorController *-- .Interrupt
 .Movement o-left- .Motor
 .Robot o-- .Movement
-
-/' Nested objects '/
-.Movement *-right- .Data
 
 @enduml

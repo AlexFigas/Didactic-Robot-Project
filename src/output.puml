@@ -1,9 +1,10 @@
-@startuml Diagrama de classes
-!theme mono
+@startuml
 
-skinparam linetype ortho
+
+
 
 /' Objects '/
+
 class Expander {
 	+Expander(byte address)
 	-_board : Adafruit_PWMServoDriver
@@ -19,14 +20,6 @@ class Expander {
 	+setPWM(byte channel, int pwm) : void
 }
 
-
-struct Data {
-	+ratio : float
-	+pwmLeft : int
-	+pwmRight : int
-	+ticksLeft : int
-	+ticksRight : int
-}
 
 class Motor {
 	+Motor(Expander expander, MotorController controller)
@@ -92,32 +85,23 @@ abstract class Movement {
 	+stop() : void
 }
 
-class Robot {
-    +Robot(String name, Movement* movement)
 
-    -_movement : Movement
-    -_name : String
-    -_command : String
-
-    +begin() : void
-    +loop() : void
-    -_processCommand(String command) : void
-}
-
-class MovementTwoMotors extends Movement {
-
+class Data {
+	+ratio : float
+	+pwmLeft : int
+	+pwmRight : int
+	+ticksLeft : int
+	+ticksRight : int
 }
 
 
-
-
-struct Interrupt {
+class Interrupt {
 	+INT_COUNT : byte
 	+PIN_DO : byte
 }
 
 
-struct MotorController {
+class MotorController {
 	+interrupt : Interrupt
 	+PIN_EN : byte
 	+PIN_IN1 : byte
@@ -125,12 +109,38 @@ struct MotorController {
 	+wheelRadius : float
 }
 
+
+
+
+
+/' Inheritance relationships '/
+
+
+
+
 /' Aggregation relationships '/
+
 .Motor *-- .Expander
+
+
 .Motor *-- .Interrupt
+
+
 .Motor *-- .MotorController
-.MotorController *-left- .Interrupt
-.Movement o-left- .Motor
-.Robot o-- .Movement
+
+
+.MotorController *-- .Interrupt
+
+
+.Movement o-- .Motor
+
+
+
+
+
+
+/' Nested objects '/
+
+
 
 @enduml
