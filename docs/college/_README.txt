@@ -7,4 +7,4 @@ Dependencias:
     - Instalar a biblioteca Adafruit PWM Servo Driver de forma a controlar o expansor - https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library
 
 Todo o código fonte bem como versões encontra-se no github oficial do projeto:
-    - https://github.com/AlexFigas/Projeto-Robot-Didatico
+    - https://github.com/AlexFigas/Didactic-Robot-Project

@@ -71,6 +71,10 @@ To get started with this project you must have some sort of Arduino development 
     ```sh
     git clone https://github.com/AlexFigas/Projeto-Robot-Didatico.git
     ```
+
+or
+
+3. In your Arduino IDE go to Tools > Manage Libraries > Search Didactic Robot > Install
 4. Enjoy!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
