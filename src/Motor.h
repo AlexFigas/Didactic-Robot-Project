@@ -9,7 +9,7 @@
 
 #include <Arduino.h>
 #include "Expander.h"
-#include <Math.h>
+#include <math.h>
 #include <FunctionalInterrupt.h>
 
 /**

@@ -23,11 +23,18 @@ public:
     void begin();
     void loop();
 
+protected:
+    // Protected constants
+
+    // Protected variables
+    Movement* _movement;
+
+    // Protected methods
+
 private:
     // Private constants
 
     // Private variables
-    Movement* _movement;
     String _name;
     String _command;
 
