@@ -7,18 +7,18 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
-#include <Arduino.h>
 #include "Expander.h"
-#include <math.h>
+#include <Arduino.h>
 #include <FunctionalInterrupt.h>
+#include <math.h>
 
 /**
  * @brief Struct representing an interrupt configuration.
  */
 struct Interrupt
 {
-    byte PIN_DO;    // Digital input pin for the interrupt
-    byte INT_COUNT; // Interrupt counter value
+    byte PIN_DO;     // Digital input pin for the interrupt
+    byte INT_COUNT;  // Interrupt counter value
 };
 
 /**
@@ -26,11 +26,11 @@ struct Interrupt
  */
 struct MotorController
 {
-    byte PIN_EN;         // Enable pin for the motor controller
-    byte PIN_IN1;        // Input 1 pin for the motor controller
-    byte PIN_IN2;        // Input 2 pin for the motor controller
-    Interrupt interrupt; // Interrupt configuration for the motor controller
-    float wheelRadius;   // Wheel radius in centimeters
+    byte PIN_EN;          // Enable pin for the motor controller
+    byte PIN_IN1;         // Input 1 pin for the motor controller
+    byte PIN_IN2;         // Input 2 pin for the motor controller
+    Interrupt interrupt;  // Interrupt configuration for the motor controller
+    float wheelRadius;    // Wheel radius in centimeters
 };
 
 /**
@@ -38,7 +38,7 @@ struct MotorController
  */
 class Motor
 {
-public:
+  public:
     // Public constants
 
     // Public variables
@@ -51,13 +51,13 @@ public:
      * @param expander - An optional Expander object for expanding the available GPIO pins.
      * @param controller - An optional MotorController object for configuring the motor controller.
      */
-    Motor(Expander expander, MotorController controller);
+    Motor(Expander& expander, MotorController controller);
 
     /**
      * @brief Initializes the motor and motor controller pins.
      * This method should be called once at the beginning of the program.
      */
-    void begin();
+    virtual void begin();
 
     /**
      * @brief Sets the direction of the motor.
@@ -65,7 +65,7 @@ public:
      * @param clockwise - A boolean indicating the direction of the motor.
      *                    true for clockwise, false for counterclockwise.
      */
-    void setDirection(bool clockwise);
+    virtual void setDirection(bool clockwise);
 
     /**
      * @brief Starts the motor in the forward direction.
@@ -75,7 +75,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void front(float speed, float length = 0);
+    virtual void front(float speed, float length = 0);
 
     /**
      * @brief Starts the motor in the backward direction.
@@ -85,7 +85,7 @@ public:
      * @param cm - An optional float indicating the distance to travel in centimeters.
      *             Defaults to 0.
      */
-    void back(float speed, float cm = 0);
+    virtual void back(float speed, float cm = 0);
 
     /**
      * @brief Stops the motor.
@@ -93,17 +93,17 @@ public:
      * @param now - A boolean indicating whether to stop the motor immediately (true) or coast to a stop (false).
      *              Defaults to false.
      */
-    void stop();
+    virtual void stop();
 
     /**
      * @brief Slows the motor down.
      */
-    void slow();
+    virtual void slow();
 
     /**
      * @brief Blocks the motor.
      */
-    void block();
+    virtual void block();
 
     /**
      * @brief Gets the current interrupt count.
@@ -123,7 +123,7 @@ public:
      * @param speed - An integer indicating the speed of the motor.
      *                Must be between 0 and 100.
      */
-    void setSpeed(float speed);
+    virtual void setSpeed(float speed);
 
     /**
      * @brief Gets the speed of the motor.
@@ -138,7 +138,7 @@ public:
      * @param pwm - An integer indicating the PWM of the motor.
      *              Must be between 0 and 100.
      */
-    void setPWM(int pwm);
+    virtual void setPWM(int pwm);
 
     /**
      * @brief Gets the PWM of the motor.
@@ -167,23 +167,30 @@ public:
      */
     float getPerimeter();
 
-private:
+  protected:
+    // Protected constants
+
+    // Protected variables
+    Expander& _expander;          // The Expander object for expanding the available GPIO pins
+    MotorController _controller;  // The MotorController object for configuring the motor controller
+
+    // Protected methods
+
+  private:
     // Private constants
-    static constexpr const float _FULL_SPEED = 100.0; // The maximum speed value
-    static constexpr const float _STOP_SPEED = 0.0;   // The minimum speed value
-    static const int _INTERRUPT_FIX = 2;              // Multiplicative constant for interrupt attach on change
+    static constexpr const float _FULL_SPEED = 100.0;  // The maximum speed value
+    static constexpr const float _STOP_SPEED = 0.0;    // The minimum speed value
+    static const int _INTERRUPT_FIX = 2;               // Multiplicative constant for interrupt attach on change
 
     // Private variables
-    Expander _expander;          // The Expander object for expanding the available GPIO pins
-    Interrupt _interrupt;        // The Interrupt object for configuring the interrupt
-    MotorController _controller; // The MotorController object for configuring the motor controller
+    Interrupt _interrupt;  // The Interrupt object for configuring the interrupt
 
-    volatile int _counter; // The interrupt counter for the motor
+    volatile int _counter;  // The interrupt counter for the motor
     int _turnInterruptCount;
-    int _interruptTarget; // Interrupt target for the motor
-    int _hasInterrupt;    // Flag for interrupt mode
+    int _interruptTarget;  // Interrupt target for the motor
+    int _hasInterrupt;     // Flag for interrupt mode
 
-    float _perimeter; // Wheel perimeter (cm)
+    float _perimeter;  // Wheel perimeter (cm)
     float _radius;
     float _speed;
     int _pwm;

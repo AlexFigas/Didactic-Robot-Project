@@ -23,6 +23,11 @@ int Expander::setDutyCycle(byte channel, float duty_cycle)
     return pwm;
 }
 
+void Expander::setPWMFreq(float freq)
+{
+    _board.setPWMFreq(freq);
+}
+
 void Expander::setPWM(byte channel, int pwm)
 {
     _board.setPWM(channel, _PWM_OFF_POINT, pwm);

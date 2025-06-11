@@ -7,13 +7,13 @@ Data dataLine[length];
 int indexDataCurve;
 Data dataCurve[length];
 
-Movement::Movement(Motor *motors, float track)
+Movement::Movement(Motor* motors, float track) : _motors(motors), _track(track)
 {
     _motors = motors;
     _track = track;
 }
 
-Motor *Movement::getMotors()
+Motor* Movement::getMotors()
 {
     return _motors;
 }
@@ -61,15 +61,15 @@ void Movement::line(float speed, float length, bool isFront)
     block();
     reset();
 
-    //char auxBuffer[80];
-    // sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
-    // SerialBT.println(auxBuffer);
+    // char auxBuffer[80];
+    //  sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
+    //  SerialBT.println(auxBuffer);
 
-    //for (int i = 0; i < length; i++)
+    // for (int i = 0; i < length; i++)
     //{
-    //    sprintf(auxBuffer, "%d;%d;%d;%d;%f", dataLine[i].pwmLeft, dataLine[i].pwmRight, dataLine[i].ticksLeft, dataLine[i].ticksRight, dataLine[i].ratio);
-    //    SerialBT.println(auxBuffer);
-    //}
+    //     sprintf(auxBuffer, "%d;%d;%d;%d;%f", dataLine[i].pwmLeft, dataLine[i].pwmRight, dataLine[i].ticksLeft,
+    //     dataLine[i].ticksRight, dataLine[i].ratio); SerialBT.println(auxBuffer);
+    // }
 }
 
 void Movement::front(float speed, float length)

@@ -7,8 +7,8 @@
 #ifndef EXPANDER_H
 #define EXPANDER_H
 
-#include <Arduino.h>
 #include <Adafruit_PWMServoDriver.h>
+#include <Arduino.h>
 #include <Wire.h>
 
 /**
@@ -16,7 +16,7 @@
  */
 class Expander
 {
-public:
+  public:
     // Public constants
 
     // Public variables
@@ -54,18 +54,43 @@ public:
      */
     void setPWM(byte channel, int pwm);
 
-private:
+    /**
+     * @brief Set the maximum PWM on point.
+     *
+     * @param max_pwm_on - An int indicating the maximum PWM on point.
+     *                    Must be between 0 and 4095.
+     */
+    void setMaxPwmOn(int max_pwm_on) { _MAX_PWM_ON = max_pwm_on; }
+
+    /**
+     * @brief Set the minimum PWM on point.
+     *
+     * @param min_pwm_on - An int indicating the minimum PWM on point.
+     *                    Must be between 0 and 4095.
+     */
+    void setMinPwmOn(int min_pwm_on) { _MIN_PWM_ON = min_pwm_on; }
+
+    void setPWMFreq(float freq);
+
+  protected:
+    // Protected variables
+
+    // Protected constants
+
+    // Protected methods
+
+  private:
     // Private constants
-    const static byte _MAX_DUTY_CYCLE = 100; // The maximum duty cycle value
-    const static byte _MIN_DUTY_CYCLE = 0;   // The minimum duty cycle value
-    const static int _MAX_PWM_ON = 4095;     // The maximum PWM on point value
-    const static int _MIN_PWM_ON = 0;        // The minimum PWM on point value
-    const static int _PWM_OFF_POINT = 0;     // The PWM off point value
+    const static byte _MAX_DUTY_CYCLE = 100;  // The maximum duty cycle value
+    const static byte _MIN_DUTY_CYCLE = 0;    // The minimum duty cycle value
+    const static int _PWM_OFF_POINT = 0;      // The PWM off point value
+    int _MAX_PWM_ON = 4095;                   // The maximum PWM on point value
+    int _MIN_PWM_ON = 0;                      // The minimum PWM on point value
 
     // Private variables
-    byte _address;                  // The I2C address of the expander
-    Adafruit_PWMServoDriver _board; // The Adafruit_PWMServoDriver object for controlling the expander
-    bool _initialized;              // A boolean indicating whether the expander has been initialized
+    byte _address;                   // The I2C address of the expander
+    Adafruit_PWMServoDriver _board;  // The Adafruit_PWMServoDriver object for controlling the expander
+    bool _initialized;               // A boolean indicating whether the expander has been initialized
 
     // Private methods
 };
