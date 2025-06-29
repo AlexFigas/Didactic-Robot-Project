@@ -7,16 +7,7 @@ Data dataLine[length];
 int indexDataCurve;
 Data dataCurve[length];
 
-Movement::Movement(Motor* motors, float track) : _motors(motors), _track(track)
-{
-    _motors = motors;
-    _track = track;
-}
-
-Motor* Movement::getMotors()
-{
-    return _motors;
-}
+Movement::Movement(Motor* left, Motor* right, float track) : leftMotor(left), rightMotor(right), _track(track) {}
 
 float Movement::getTrack()
 {
@@ -25,10 +16,8 @@ float Movement::getTrack()
 
 void Movement::begin()
 {
-    for (int i = 0; i < _numMotors; i++)
-    {
-        _motors[i].begin();
-    }
+    leftMotor->begin();
+    rightMotor->begin();
 }
 
 void Movement::line(float speed, float length, bool isFront)
@@ -48,10 +37,10 @@ void Movement::line(float speed, float length, bool isFront)
     }
 
     indexDataLine = 0;
-    dataLine[indexDataLine].pwmLeft = _motors[MOTOR_LEFT].getPWM();
-    dataLine[indexDataLine].pwmRight = _motors[MOTOR_RIGHT].getPWM();
-    dataLine[indexDataLine].ticksLeft = _motors[MOTOR_LEFT].getCounter();
-    dataLine[indexDataLine].ticksRight = _motors[MOTOR_RIGHT].getCounter();
+    dataLine[indexDataLine].pwmLeft = leftMotor->getPWM();
+    dataLine[indexDataLine].pwmRight = rightMotor->getPWM();
+    dataLine[indexDataLine].ticksLeft = leftMotor->getCounter();
+    dataLine[indexDataLine].ticksRight = rightMotor->getCounter();
     dataLine[indexDataLine].ratio = 0.0f;
 
     directionLineCalibration();
@@ -60,66 +49,40 @@ void Movement::line(float speed, float length, bool isFront)
     slow();
     block();
     reset();
-
-    // char auxBuffer[80];
-    //  sprintf(auxBuffer, "index;pwmLeft;pwmRight;ticksLeft;ticksRight;ratio");
-    //  SerialBT.println(auxBuffer);
-
-    // for (int i = 0; i < length; i++)
-    //{
-    //     sprintf(auxBuffer, "%d;%d;%d;%d;%f", dataLine[i].pwmLeft, dataLine[i].pwmRight, dataLine[i].ticksLeft,
-    //     dataLine[i].ticksRight, dataLine[i].ratio); SerialBT.println(auxBuffer);
-    // }
 }
 
 void Movement::front(float speed, float length)
 {
-    // Forward movement of wheels
-    for (int i = 0; i < _numMotors; i++)
-    {
-        // Start the motor
-        _motors[i].front(speed, length);
-    }
+    leftMotor->front(speed, length);
+    rightMotor->front(speed, length);
 }
 
 void Movement::back(float speed, float length)
 {
-    // Backward movement of wheels
-    for (int i = 0; i < _numMotors; i++)
-    {
-        // Start the motor
-        _motors[i].back(speed, length);
-    }
+    leftMotor->back(speed, length);
+    rightMotor->back(speed, length);
 }
 
 void Movement::slow()
 {
-    for (int i = 0; i < _numMotors; i++)
-    {
-        _motors[i].slow();
-    }
+    leftMotor->slow();
+    rightMotor->slow();
 }
 
 void Movement::block()
 {
-    for (int i = 0; i < _numMotors; i++)
-    {
-        _motors[i].block();
-    }
+    leftMotor->block();
+    rightMotor->block();
 }
 
 void Movement::stop()
 {
-    for (int i = 0; i < _numMotors; i++)
-    {
-        _motors[i].stop();
-    }
+    leftMotor->stop();
+    rightMotor->stop();
 }
 
 void Movement::reset()
 {
-    for (int i = 0; i < _numMotors; i++)
-    {
-        _motors[i].resetCounter();
-    }
+    leftMotor->resetCounter();
+    rightMotor->resetCounter();
 }

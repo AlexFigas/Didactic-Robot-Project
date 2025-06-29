@@ -45,12 +45,12 @@ class Movement
 {
   public:
     /**
-     * @brief Construct a new Movement object
+     * @brief Constructor for the Movement class.
      *
      * @param motors - An array of Motor objects.
      * @param track - The track of the robot in centimeters.
      */
-    Movement(Motor* motors, float track);
+    Movement(Motor* left, Motor* right, float track);
 
     /**
      * @brief Initializes the motors.
@@ -154,7 +154,8 @@ class Movement
     Motor* getMotors();
 
   protected:
-    Motor* _motors;            // Array of motors
+    Motor* leftMotor;          // Left motor
+    Motor* rightMotor;         // Right motor
     int _numMotors;            // Number of motors
     int _MIN_PWM = 2048;       // Minimum PWM value
     int _MAX_PWM = 4095;       // Maximum PWM value

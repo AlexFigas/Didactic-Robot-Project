@@ -26,7 +26,7 @@ class MovementTwoMotors : public Movement
      * @param motors - An array of Motor objects.
      * @param track - The track of the robot in centimeters.
      */
-    MovementTwoMotors(Motor* motors, float track);
+    MovementTwoMotors(Motor* left, Motor* right, float track);
 
     /**
      * @brief Moves the robot in a curve.

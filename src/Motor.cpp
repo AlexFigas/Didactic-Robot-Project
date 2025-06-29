@@ -17,7 +17,6 @@ Motor::Motor(Expander& expander, MotorController controller) : _expander(expande
 
 void Motor::begin()
 {
-    Serial.println("Motor::begin()");
     // Set initial direction
     _expander.begin();
     _expander.setDutyCycle(_controller.PIN_EN, 0);
