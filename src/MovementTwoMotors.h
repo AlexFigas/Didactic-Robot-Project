@@ -67,6 +67,7 @@ class MovementTwoMotors : public Movement
     void directionLineCalibration() override;
 
   private:
+    Motor* _motors[2];
 };
 
 #endif

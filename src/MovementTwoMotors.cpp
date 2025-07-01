@@ -3,9 +3,11 @@
 
 // extern BluetoothSerial SerialBT;
 
-MovementTwoMotors::MovementTwoMotors(Motor* left, Motor* right, float track) : Movement(left, right, track)
+MovementTwoMotors::MovementTwoMotors(Motor* left, Motor* right, float track) : Movement(_motors, 2, track)
 {
     assert(left != nullptr && right != nullptr);
+    _motors[MOTOR_LEFT] = left;
+    _motors[MOTOR_RIGHT] = right;
 }
 
 void MovementTwoMotors::curve(float speed, float radius, float angle, bool isLeft)
@@ -24,10 +26,10 @@ void MovementTwoMotors::curve(float speed, float radius, float angle, bool isLef
     }
 
     indexDataCurve = 0;
-    dataCurve[indexDataCurve].pwmLeft = leftMotor->getPWM();
-    dataCurve[indexDataCurve].pwmRight = rightMotor->getPWM();
-    dataCurve[indexDataCurve].ticksLeft = leftMotor->getCounter();
-    dataCurve[indexDataCurve].ticksRight = rightMotor->getCounter();
+    dataCurve[indexDataCurve].pwmLeft = motors[MOTOR_LEFT]->getPWM();
+    dataCurve[indexDataCurve].pwmRight = motors[MOTOR_RIGHT]->getPWM();
+    dataCurve[indexDataCurve].ticksLeft = motors[MOTOR_LEFT]->getCounter();
+    dataCurve[indexDataCurve].ticksRight = motors[MOTOR_RIGHT]->getCounter();
     dataCurve[indexDataCurve].ratio = 0.0f;
 
     directionCurveCalibration();
@@ -80,8 +82,8 @@ void MovementTwoMotors::left(float speed, float radius, float angle)
         float leftDistance = (2.0 * PI * (radius - track2) * angle) / 360.0;
         float rightDistance = (2.0 * PI * (radius + track2) * angle) / 360.0;
 
-        getMotors()[MOTOR_LEFT].front(leftSpeed, leftDistance);
-        getMotors()[MOTOR_RIGHT].front(rightSpeed, rightDistance);
+        getMotors()[MOTOR_LEFT]->front(leftSpeed, leftDistance);
+        getMotors()[MOTOR_RIGHT]->front(rightSpeed, rightDistance);
     }
 }
 
@@ -116,8 +118,8 @@ void MovementTwoMotors::right(float speed, float radius, float angle)
         float leftDistance = (2.0 * PI * (radius - track2) * angle) / 360.0;
         float rightDistance = (2.0 * PI * (radius + track2) * angle) / 360.0;
 
-        getMotors()[MOTOR_LEFT].front(leftSpeed, leftDistance);
-        getMotors()[MOTOR_RIGHT].front(rightSpeed, rightDistance);
+        getMotors()[MOTOR_LEFT]->front(leftSpeed, leftDistance);
+        getMotors()[MOTOR_RIGHT]->front(rightSpeed, rightDistance);
     }
 }
 
@@ -126,11 +128,11 @@ void MovementTwoMotors::directionCurveCalibration()
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
 
-    int currentLeftCounter = leftMotor->getCounter();
-    int currentRightCounter = rightMotor->getCounter();
+    int currentLeftCounter = motors[MOTOR_LEFT]->getCounter();
+    int currentRightCounter = motors[MOTOR_RIGHT]->getCounter();
 
-    int leftTarget = leftMotor->getTargetInterrupt();
-    int rightTarget = rightMotor->getTargetInterrupt();
+    int leftTarget = motors[MOTOR_LEFT]->getTargetInterrupt();
+    int rightTarget = motors[MOTOR_RIGHT]->getTargetInterrupt();
 
     float k = (float)(leftTarget) / (float)(rightTarget);
 
@@ -143,8 +145,8 @@ void MovementTwoMotors::directionCurveCalibration()
         unsigned long currentTime = millis();
         if (currentTime >= timeout)
         {
-            currentLeftCounter = leftMotor->getCounter();
-            currentRightCounter = rightMotor->getCounter();
+            currentLeftCounter = motors[MOTOR_LEFT]->getCounter();
+            currentRightCounter = motors[MOTOR_RIGHT]->getCounter();
 
             int diffLeft = currentLeftCounter - dataCurve[indexDataCurve].ticksLeft;
             int diffRight = currentRightCounter - dataCurve[indexDataCurve].ticksRight;
@@ -203,19 +205,19 @@ void MovementTwoMotors::directionLineCalibration()
     unsigned long timeout = millis() + _PERIOD * _SAMPLES_TO_SKIP;
     unsigned long finalTime = millis() + _EXEC_TIME;
 
-    int currentLeftCounter = leftMotor->getCounter();
-    int currentRightCounter = rightMotor->getCounter();
+    int currentLeftCounter = motors[MOTOR_LEFT]->getCounter();
+    int currentRightCounter = motors[MOTOR_RIGHT]->getCounter();
 
-    int leftTarget = leftMotor->getTargetInterrupt();
-    int rightTarget = rightMotor->getTargetInterrupt();
+    int leftTarget = motors[MOTOR_LEFT]->getTargetInterrupt();
+    int rightTarget = motors[MOTOR_RIGHT]->getTargetInterrupt();
 
     while ((currentLeftCounter < leftTarget || currentRightCounter < rightTarget))
     {
         unsigned long currentTime = millis();
         if (currentTime >= timeout)
         {
-            currentLeftCounter = leftMotor->getCounter();
-            currentRightCounter = rightMotor->getCounter();
+            currentLeftCounter = motors[MOTOR_LEFT]->getCounter();
+            currentRightCounter = motors[MOTOR_RIGHT]->getCounter();
 
             int diffLeft = currentLeftCounter - dataLine[indexDataLine].ticksLeft;
             int diffRight = currentRightCounter - dataLine[indexDataLine].ticksRight;
@@ -238,13 +240,13 @@ void MovementTwoMotors::directionLineCalibration()
 
                 if (diffLeft > diffRight)
                 {
-                    rightSpeed = rightMotor->getPWM() * ratioAdd;
-                    leftSpeed = leftMotor->getPWM() * ratioSub;
+                    rightSpeed = motors[MOTOR_RIGHT]->getPWM() * ratioAdd;
+                    leftSpeed = motors[MOTOR_LEFT]->getPWM() * ratioSub;
                 }
                 else
                 {
-                    rightSpeed = rightMotor->getPWM() * ratioSub;
-                    leftSpeed = leftMotor->getPWM() * ratioAdd;
+                    rightSpeed = motors[MOTOR_RIGHT]->getPWM() * ratioSub;
+                    leftSpeed = motors[MOTOR_LEFT]->getPWM() * ratioAdd;
                 }
 
                 float motorDif_right =
@@ -259,12 +261,12 @@ void MovementTwoMotors::directionLineCalibration()
                                 ? _MIN_PWM
                                 : (leftSpeed + motorDif_right > _MAX_PWM ? _MAX_PWM : leftSpeed + motorDif_right);
 
-                rightMotor->setPWM(rightSpeed);
-                leftMotor->setPWM(leftSpeed);
+                motors[MOTOR_RIGHT]->setPWM(rightSpeed);
+                motors[MOTOR_LEFT]->setPWM(leftSpeed);
 
                 ++indexDataLine;
-                dataLine[indexDataLine].pwmLeft = leftMotor->getPWM();
-                dataLine[indexDataLine].pwmRight = rightMotor->getPWM();
+                dataLine[indexDataLine].pwmLeft = motors[MOTOR_LEFT]->getPWM();
+                dataLine[indexDataLine].pwmRight = motors[MOTOR_RIGHT]->getPWM();
                 dataLine[indexDataLine].ticksLeft = currentLeftCounter;
                 dataLine[indexDataLine].ticksRight = currentRightCounter;
                 dataLine[indexDataLine].ratio = ratio;

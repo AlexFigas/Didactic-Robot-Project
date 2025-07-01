@@ -7,17 +7,21 @@ Data dataLine[length];
 int indexDataCurve;
 Data dataCurve[length];
 
-Movement::Movement(Motor* left, Motor* right, float track) : leftMotor(left), rightMotor(right), _track(track) {}
+Movement::Movement(Motor** motors, int numMotors, float track) : motors(motors), _numMotors(numMotors), _track(track) {}
 
 float Movement::getTrack()
 {
     return _track;
 }
+Motor** Movement::getMotors()
+{
+    return motors;
+}
 
 void Movement::begin()
 {
-    leftMotor->begin();
-    rightMotor->begin();
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->begin();
 }
 
 void Movement::line(float speed, float length, bool isFront)
@@ -37,10 +41,10 @@ void Movement::line(float speed, float length, bool isFront)
     }
 
     indexDataLine = 0;
-    dataLine[indexDataLine].pwmLeft = leftMotor->getPWM();
-    dataLine[indexDataLine].pwmRight = rightMotor->getPWM();
-    dataLine[indexDataLine].ticksLeft = leftMotor->getCounter();
-    dataLine[indexDataLine].ticksRight = rightMotor->getCounter();
+    dataLine[indexDataLine].pwmLeft = motors[MOTOR_LEFT]->getPWM();
+    dataLine[indexDataLine].pwmRight = motors[MOTOR_RIGHT]->getPWM();
+    dataLine[indexDataLine].ticksLeft = motors[MOTOR_LEFT]->getCounter();
+    dataLine[indexDataLine].ticksRight = motors[MOTOR_RIGHT]->getCounter();
     dataLine[indexDataLine].ratio = 0.0f;
 
     directionLineCalibration();
@@ -53,36 +57,36 @@ void Movement::line(float speed, float length, bool isFront)
 
 void Movement::front(float speed, float length)
 {
-    leftMotor->front(speed, length);
-    rightMotor->front(speed, length);
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->front(speed, length);
 }
 
 void Movement::back(float speed, float length)
 {
-    leftMotor->back(speed, length);
-    rightMotor->back(speed, length);
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->back(speed, length);
 }
 
 void Movement::slow()
 {
-    leftMotor->slow();
-    rightMotor->slow();
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->slow();
 }
 
 void Movement::block()
 {
-    leftMotor->block();
-    rightMotor->block();
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->block();
 }
 
 void Movement::stop()
 {
-    leftMotor->stop();
-    rightMotor->stop();
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->stop();
 }
 
 void Movement::reset()
 {
-    leftMotor->resetCounter();
-    rightMotor->resetCounter();
+    for (int i = 0; i < _numMotors; ++i)
+        motors[i]->resetCounter();
 }
