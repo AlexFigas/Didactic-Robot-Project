@@ -16,7 +16,7 @@
 #define _EXEC_TIME 3000
 #define _SAMPLES_TO_SKIP 4
 
-int const length = (_EXEC_TIME / _PERIOD) - (_SAMPLES_TO_SKIP - 1); // Size of the array
+int const length = (_EXEC_TIME / _PERIOD) - (_SAMPLES_TO_SKIP - 1);  // Size of the array
 
 /**
  * @brief Struct representing a data sample.
@@ -30,10 +30,10 @@ struct Data
     float ratio;
 };
 
-extern int indexDataLine;      // Debug index data
-extern Data dataLine[length];  // Debug data
-extern int indexDataCurve;     // Debug index data curve
-extern Data dataCurve[length]; // Debug data curve
+extern int indexDataLine;       // Debug index data
+extern Data dataLine[length];   // Debug data
+extern int indexDataCurve;      // Debug index data curve
+extern Data dataCurve[length];  // Debug data curve
 
 /**
  * @brief Class representing the movement of a robot.
@@ -43,14 +43,14 @@ extern Data dataCurve[length]; // Debug data curve
  */
 class Movement
 {
-public:
+  public:
     /**
      * @brief Construct a new Movement object
      *
      * @param motors - An array of Motor objects.
      * @param track - The track of the robot in centimeters.
      */
-    Movement(Motor *motors, float track);
+    Movement(Motor* motors, float track);
 
     /**
      * @brief Initializes the motors.
@@ -151,17 +151,17 @@ public:
     /**
      * @brief Returns the array of motors.
      */
-    Motor *getMotors();
+    Motor* getMotors();
 
-protected:
-    Motor *_motors;           // Array of motors
-    int _numMotors;           // Number of motors
-    int _MIN_PWM = 2048;      // Minimum PWM value
-    int _MAX_PWM = 4095;      // Maximum PWM value
-    float _MIN_SPEED = 50.0;  // Minimum speed in percentage
-    float _MAX_SPEED = 100.0; // Maximum speed in percentage
+  protected:
+    Motor* _motors;            // Array of motors
+    int _numMotors;            // Number of motors
+    int _MIN_PWM = 2048;       // Minimum PWM value
+    int _MAX_PWM = 4095;       // Maximum PWM value
+    float _MIN_SPEED = 50.0;   // Minimum speed in percentage
+    float _MAX_SPEED = 100.0;  // Maximum speed in percentage
 
-private:
-    float _track; // Distance between wheels (cm)
+  private:
+    float _track;  // Distance between wheels (cm)
 };
 #endif

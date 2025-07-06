@@ -1,12 +1,12 @@
 #include "Motor.h"
 
-Motor::Motor(Expander expander, MotorController controller)
+Motor::Motor(Expander& expander, MotorController controller) : _expander(expander)
 {
     _expander = expander;
     _controller = controller;
 
     _radius = _controller.wheelRadius;
-    _perimeter = 21.5; // 2 * _controller.wheelRadius * PI;
+    _perimeter = 21.5;  // 2 * _controller.wheelRadius * PI;
 
     _turnInterruptCount = _controller.interrupt.INT_COUNT * _INTERRUPT_FIX;
     _counter = 0;
@@ -28,7 +28,8 @@ void Motor::begin()
     if (_hasInterrupt)
     {
         pinMode(_controller.interrupt.PIN_DO, INPUT_PULLUP);
-        attachInterrupt(digitalPinToInterrupt(_controller.interrupt.PIN_DO), std::bind(&Motor::_incrementCounter, this), CHANGE);
+        attachInterrupt(
+            digitalPinToInterrupt(_controller.interrupt.PIN_DO), std::bind(&Motor::_incrementCounter, this), CHANGE);
     }
 }
 
@@ -36,13 +37,13 @@ void Motor::setDirection(bool clockwise)
 {
     if (clockwise)
     {
-        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED); // Clockwise
-        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _FULL_SPEED);  // Clockwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _STOP_SPEED);  // Counterclockwise
     }
     else
     {
-        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED); // Clockwise
-        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED); // Counterclockwise
+        _expander.setDutyCycle(_controller.PIN_IN1, _STOP_SPEED);  // Clockwise
+        _expander.setDutyCycle(_controller.PIN_IN2, _FULL_SPEED);  // Counterclockwise
     }
 }
 

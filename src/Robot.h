@@ -6,13 +6,13 @@
 
 #ifndef ROBOT_H
 #define ROBOT_H
-#include <BluetoothSerial.h>
-#include <Arduino.h>
 #include "Movement.h"
+#include <Arduino.h>
+#include <BluetoothSerial.h>
 
 class Robot
 {
-public:
+  public:
     Robot(String name, Movement* movement);
 
     // Public constants
@@ -20,14 +20,21 @@ public:
     // Public variables
 
     // Public methods
-    void begin();
+    virtual void begin();
     void loop();
 
-private:
+  protected:
+    // Protected constants
+
+    // Protected variables
+    Movement* _movement;
+
+    // Protected methods
+
+  private:
     // Private constants
 
     // Private variables
-    Movement* _movement;
     String _name;
     String _command;
 

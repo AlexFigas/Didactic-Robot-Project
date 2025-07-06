@@ -8,8 +8,8 @@
 #define MOVEMENTTWOMOTORS_H
 
 #include "Movement.h"
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 /**
  * @brief Class representing the movement of a robot with two motors.
@@ -19,14 +19,14 @@
  */
 class MovementTwoMotors : public Movement
 {
-public:
+  public:
     /**
      * @brief Construct a new MovementTwoMotors object
      *
      * @param motors - An array of Motor objects.
      * @param track - The track of the robot in centimeters.
      */
-    MovementTwoMotors(Motor *motors, float track);
+    MovementTwoMotors(Motor* motors, float track);
 
     /**
      * @brief Moves the robot in a curve.
@@ -66,7 +66,7 @@ public:
      */
     void directionLineCalibration() override;
 
-private:
+  private:
 };
 
 #endif

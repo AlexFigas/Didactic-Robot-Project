@@ -1,6 +1,6 @@
 #include "Robot.h"
 
-BluetoothSerial _serialBT; 
+BluetoothSerial _serialBT;
 
 Robot::Robot(String name, Movement* movement)
 {
